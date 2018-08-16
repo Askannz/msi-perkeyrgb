@@ -16,16 +16,15 @@ class HID_Keyboard:
 
         self._device = self._hidapi.hid_open(vid, pid, ct.c_wchar_p(0))
 
-        if self._device == 0:
+        if self._device is None:
 
-            print("Cannot open keyboard. Please execute this program \
-                  as root or give yourself read/write permissions to /dev/hidraw0.")
+            print("Cannot open keyboard. Please execute this program as root or give yourself read/write permissions to /dev/hidraw0.\n")
             raise RuntimeError("Cannot open keyboard.")
 
     def send_feature_report(self, data):
 
         ret = self._hidapi.hid_send_feature_report(self._device, bytes(data), len(data))
-        sleep(DELAY)
+        sleep(DELAY)  # The RGB controller derps if commands are sent too fast.
 
         if ret == -1 or ret != len(data):
             raise RuntimeError("HIDAPI returned error upon sending feature report to keyboard.")
