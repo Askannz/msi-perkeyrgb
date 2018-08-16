@@ -1,4 +1,4 @@
-from os.path import expanduser, join, exists
+from os.path import expanduser, join
 import re
 from msi_keyboard import MSI_KEYMAP
 
@@ -10,11 +10,11 @@ class ConfigError(Exception):
     pass
 
 
-class ConfigParseError(ConfigError):
+class ConfigParseError(Exception):
     pass
 
 
-class LineParseError(ConfigParseError):
+class LineParseError(Exception):
     pass
 
 
@@ -22,17 +22,24 @@ def load_config(config_name):
 
     config_path = join(expanduser(CONFIG_FOLDER), config_name)
 
-    if not exists(config_path):
-        raise ConfigError("Configuration file %s does not exist." % config_path)
+    try:
+        f = open(config_path, "r")
+        colors_map = parse_config(f)
+        f.close()
+    except IOError as e:
+        raise ConfigError("IOError : %s" % str(e)) from e
+        pass
+    except FileNotFoundError as e:
+        raise ConfigError("File %s does not exist" % config_path) from e
+        pass
+    except ConfigParseError as e:
+        raise ConfigError("Parsing error : %s" % str(e)) from e
+        pass
+    except Exception as e:
+        raise ConfigError("Unknown error : %s" % str(e)) from e
+        pass
     else:
-        try:
-            f = open(config_path, "r")
-            colors_map = parse_config(f)
-            f.close()
-        except IOError as e:
-            raise ConfigError("Error reading configuration file %s : %s" % (config_path, str(e)))
-        else:
-            return colors_map
+        return colors_map
 
 
 def parse_config(f):
@@ -47,7 +54,7 @@ def parse_config(f):
         if len(parameters) == 0:
             continue
         elif len(parameters) > 3:
-            raise ConfigParseError("Error parsing line %d : Invalid number of parameters (expected 3, got %d)" % (i+1, len(parameters)))
+            raise ConfigParseError("line %d : Invalid number of parameters (expected 3, got %d)" % (i+1, len(parameters)))
         else:
 
             try:
@@ -55,7 +62,8 @@ def parse_config(f):
                 parse_mode(parameters[1])
                 color = parse_color(parameters[2])
             except LineParseError as e:
-                raise ConfigParseError("Error parsing line %d : %s" % (i+1, str(e)))
+                raise ConfigParseError("line %d : %s" % (i+1, str(e))) from e
+                pass
             else:
                 colors_map = update_colors_map(colors_map, keycodes, color)
 
