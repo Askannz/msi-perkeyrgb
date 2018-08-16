@@ -3,13 +3,11 @@ import ctypes as ct
 from hidapi_types import set_hidapi_types
 
 DELAY = 0.01
-VENDOR_ID = 0x1038
-PRODUCT_ID = 0x1122
 
 
 class HID_Keyboard:
 
-    def __init__(self, vid=VENDOR_ID, pid=PRODUCT_ID):
+    def __init__(self, vid, pid):
 
         self._hidapi = ct.cdll.LoadLibrary('/usr/lib/libhidapi-hidraw.so')
         set_hidapi_types(self._hidapi)
