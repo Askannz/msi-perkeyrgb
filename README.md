@@ -100,6 +100,16 @@ Only WASD keys (for US layout) lit up in red.
 25,38,39,40 steady ff0000
 ```
 
+#### Permissions
+
+**IMPORTANT** : you must either
+
+* run the program as root
+
+**OR**
+
+* give yourself read/write permissions to the HID interface. This interface is shown as `/dev/hidraw*` where `*` can be 0, 1, 2... (there can be more than one if you have a USB mouse or keyboard plugged in). Find the right one (try them all if necessary) and give yourself permissions with `# chmod 666 /dev/hidraw*`.
+
 #### Command-line usage
 
 ```
