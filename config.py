@@ -8,7 +8,7 @@ ALIASES = {"all": "9-133,fn",
            "arrows": "111,113,114,116",
            "num_row": "10-21",
            "numpad": "63,77,79-91,104,106",
-           "alphanum": "24-35,38-48,52-61,65"}
+           "characters": "24-35,38-48,52-61,65"}
 
 
 class ConfigError(Exception):
