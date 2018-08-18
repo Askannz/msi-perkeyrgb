@@ -1,7 +1,37 @@
 msi-perkeyrgb
 ==================
 
-This progam allows to control the SteelSeries per-key RGB keyboard backlighting on MSI laptops such as the GE63VR. It *will not work* on models with region-based backlighting (such as GE62VR and others). For those you should use tools like [MSIKLM](https://github.com/Gibtnix/MSIKLM).
+This progam allows to control the SteelSeries per-key RGB keyboard backlighting on MSI laptops such as the GE63VR. This is an unofficial tool, I am nor related to MSI not SteelSeries in any way. It *will not work* on models with region-based backlighting (such as GE62VR and others). For those you should use tools like [MSIKLM](https://github.com/Gibtnix/MSIKLM).
+
+Command-line options
+----------
+
+```
+usage: msi-perkeyrgb [-h] [-v] [-c FILENAME] [--id VENDOR_ID:PRODUCT_ID]
+
+Tool to control per-key RGB keyboard backlighting on MSI laptops.
+https://github.com/Askannz/msi-perkeyrgb
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --version         Prints version and exits.
+  -c FILENAME, --config FILENAME
+                        Loads the configuration file with the given FILENAME.
+                        Configuration files should be put in ~/.config/msi-
+                        perkeyrgb/keyboard_configs/. Refer to the README for
+                        syntax.
+  --id VENDOR_ID:PRODUCT_ID
+                        This argument allows you to specify the vendor/product
+                        id of your keyboard. You should not have to use this
+                        unless opening the keyboard fails with the default
+                        value. IDs are in hexadecimal format (example :
+                        1038:1122)
+```
+
+Features
+----------
+Only "Steady" mode (fixed color for each key) is available for now, as I have not figured out the rest of the USB protocol yet. I will add more features later if enough people are interested.
+
 
 Compatibility
 ----------
@@ -37,7 +67,7 @@ Each line of the config file has the following syntax :
 ```
 
 * `<keycodes>` is a comma-separated list of decimal keycodes identifying the keys to apply the desired parameters to.
-	* You can find the keycode of a key using the `xev` utility : launch `xev` from the terminal and look for "keycode" in `KeyPress` events.
+	* You can find the keycode of a key using the `xev` utility (part of `xorg-xev` in Archlinux, `x11-utils` in Ubuntu) : launch `xev` from the terminal, press the desired key and look for "keycode" in the `KeyPress` event.
 	* You can specify a range of keycodes, example : `15-23`
 	* There are a few built-in aliases you can use in lieu of keycodes :
 		* `all` : the whole keyboard
@@ -76,27 +106,13 @@ Only WASD keys (for US layout) lit up in red.
 ./msi-perkeyrgb -c <name of your configuration file>
 ```
 
-Command-line options
+How does it work ?
 ----------
 
-```
-usage: msi-perkeyrgb [-h] [-v] [-c FILENAME] [--id VENDOR_ID:PRODUCT_ID]
+The SteelSeries keyboard is connected to the MSI laptop by two independent interfaces :
+* A PS/2 interface to send keypresses
+* a USB HID-compliant interface to receive RGB commands
 
-Tool to control per-key RGB keyboard backlighting on MSI laptops.
-https://github.com/Askannz/msi-perkeyrgb
+I used Wireshark to capture the USB traffic between the SteelSeries Engine on Windows and the keyboard. Then it was a matter of figuring out the protocol used. Due to a lack of time, I have only been able to reverse-engineer the "Steady" mode for each key. Feel free to improve on this work, I will review pull requests.
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -v, --version         Prints version and exits.
-  -c FILENAME, --config FILENAME
-                        Loads the configuration file with the given FILENAME.
-                        Configuration files should be put in ~/.config/msi-
-                        perkeyrgb/keyboard_configs/. Refer to the README for
-                        syntax.
-  --id VENDOR_ID:PRODUCT_ID
-                        This argument allows you to specify the vendor/product
-                        id of your keyboard. You should not have to use this
-                        unless opening the keyboard fails with the default
-                        value. IDs are in hexadecimal format (example :
-                        1038:1122)
-```
+The HID communication code was inspired by other tools designed for previous generations of MSI laptops, such as [MSIKLM](https://github.com/Gibtnix/MSIKLM).
