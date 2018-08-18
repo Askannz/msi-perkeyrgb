@@ -3,7 +3,12 @@ import re
 from msi_keyboard import MSI_KEYMAP
 
 CONFIG_FOLDER = "~/.config/msi-perkeyrgb/keyboard_configs/"
-ALIASES = {}  # TODO
+ALIASES = {"all": "9-133,fn",
+           "f_row": "67-76,95,96",
+           "arrows": "111,113,114,116",
+           "num_row": "10-21",
+           "numpad": "63,77,79-91,104,106",
+           "alphanum": "24-35,38-48,52-61,65"}
 
 
 class ConfigError(Exception):
