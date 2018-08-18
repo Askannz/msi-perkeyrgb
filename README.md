@@ -119,6 +119,8 @@ The SteelSeries keyboard is connected to the MSI laptop by two independent inter
 * A PS/2 interface to send keypresses
 * a USB HID-compliant interface to receive RGB commands
 
+On my laptop, the USB interface has the vendor/product ID 0x1038:0x1122. It should be the same for other models, but if it is not, you can specify it yourself with the `--id` option (see above).
+
 I used Wireshark to capture the USB traffic between the SteelSeries Engine on Windows and the keyboard. Then it was a matter of figuring out the protocol used. Due to a lack of time, I have only been able to reverse-engineer the "Steady" mode for each key. Feel free to improve on this work, I will review pull requests.
 
 The HID communication code was inspired by other tools designed for previous generations of MSI laptops, such as [MSIKLM](https://github.com/Gibtnix/MSIKLM).
