@@ -11,9 +11,9 @@ REGION_KEYCODES = {"alphanum": [0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 
 
 class MSI_Keyboard:
 
-    def __init__(self, vid, pid):
+    def __init__(self, id_str):
 
-        self._hid_keyboard = HID_Keyboard(vid, pid)
+        self._hid_keyboard = HID_Keyboard(id_str)
 
     def set_color_all(self, color):
 
