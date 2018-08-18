@@ -74,12 +74,12 @@ def parse_keycodes(keys_parameter):
 
     keycodes = []
 
+    # Alias substitution
+    for alias in ALIASES.keys():
+        keys_parameter = keys_parameter.replace(alias, ALIASES[alias])
+
     keys_ranges_list = keys_parameter.split(',')
     for key_str in keys_ranges_list:
-
-        # Alias substitution
-        if key_str in ALIASES.keys():
-            key_str = ALIASES[key_str]
 
         # Parsing
         if re.fullmatch("^fn$", key_str):  # Special keycode "fn"
