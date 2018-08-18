@@ -1,8 +1,6 @@
-from os.path import expanduser, join
 import re
 from msi_keyboard import MSI_KEYMAP
 
-CONFIG_FOLDER = "~/.config/msi-perkeyrgb/keyboard_configs/"
 ALIASES = {"all": "9-133,fn",
            "f_row": "67-76,95,96",
            "arrows": "111,113,114,116",
@@ -23,9 +21,7 @@ class LineParseError(Exception):
     pass
 
 
-def load_config(config_name):
-
-    config_path = join(expanduser(CONFIG_FOLDER), config_name)
+def load_config(config_path):
 
     try:
         f = open(config_path, "r")

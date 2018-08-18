@@ -3,7 +3,7 @@
 import sys
 import argparse
 import re
-from config import CONFIG_FOLDER, load_config, ConfigError
+from config import load_config, ConfigError
 from msi_keyboard import MSI_Keyboard
 from hidapi_wrapping import HIDLibraryError, HIDNotFoundError, HIDOpenError
 
@@ -12,7 +12,7 @@ DEFAULT_ID = "1038:1122"
 
 parser = argparse.ArgumentParser(description='Tool to control per-key RGB keyboard backlighting on MSI laptops. https://github.com/Askannz/msi-perkeyrgb')
 parser.add_argument('-v', '--version', action='store_true', help='Prints version and exits.')
-parser.add_argument('-c', '--config', action='store', metavar='FILENAME', help='Loads the configuration file with the given FILENAME. Configuration files should be put in %s. Refer to the README for syntax.' % CONFIG_FOLDER)
+parser.add_argument('-c', '--config', action='store', metavar='FILEPATH', help='Loads the configuration file located at FILEPATH. Refer to the README for syntax.')
 parser.add_argument('--id', action='store', metavar='VENDOR_ID:PRODUCT_ID', help='This argument allows you to specify the vendor/product id of your keyboard. You should not have to use this unless opening the keyboard fails with the default value. IDs are in hexadecimal format (example :  1038:1122)')
 
 args = parser.parse_args()

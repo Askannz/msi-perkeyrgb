@@ -7,7 +7,7 @@ Command-line options
 ----------
 
 ```
-usage: msi-perkeyrgb [-h] [-v] [-c FILENAME] [--id VENDOR_ID:PRODUCT_ID]
+usage: msi-perkeyrgb [-h] [-v] [-c FILEPATH] [--id VENDOR_ID:PRODUCT_ID]
 
 Tool to control per-key RGB keyboard backlighting on MSI laptops.
 https://github.com/Askannz/msi-perkeyrgb
@@ -15,11 +15,9 @@ https://github.com/Askannz/msi-perkeyrgb
 optional arguments:
   -h, --help            show this help message and exit
   -v, --version         Prints version and exits.
-  -c FILENAME, --config FILENAME
-                        Loads the configuration file with the given FILENAME.
-                        Configuration files should be put in ~/.config/msi-
-                        perkeyrgb/keyboard_configs/. Refer to the README for
-                        syntax.
+  -c FILEPATH, --config FILEPATH
+                        Loads the configuration file located at FILEPATH.
+                        Refer to the README for syntax.
   --id VENDOR_ID:PRODUCT_ID
                         This argument allows you to specify the vendor/product
                         id of your keyboard. You should not have to use this
@@ -58,9 +56,7 @@ chmod +x msi-perkeyrgb
 Usage
 ----------
 
-You must write your RGB configuration in a file and put it in `~/.config/msi-perkeyrgb/keyboard_configs/` (create the missing folders if necessary).
-
-Each line of the config file has the following syntax :
+You must write your RGB configuration in a file. Each line should have the following syntax :
 
 ```
 <keycodes> <mode> <mode options>
@@ -113,7 +109,7 @@ Only WASD keys (for US layout) lit up in red.
 #### Command-line usage
 
 ```
-./msi-perkeyrgb -c <name of your configuration file>
+./msi-perkeyrgb -c <path to your configuration file>
 ```
 
 How does it work ?
