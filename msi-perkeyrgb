@@ -49,5 +49,6 @@ else:
             except HIDOpenError:
                 print("Cannot open keyboard. Possible causes :\n- You don't have permissions to open the HID device. Run this program as root, or give yourself read/write permissions to the corresponding /dev/hidraw*.\n- USB device with id %s is not a HID device." % id_str)
             else:
+                kb.set_color_all([0, 0, 0])
                 kb.set_colors(colors_map)
                 kb.refresh()
