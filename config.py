@@ -82,7 +82,9 @@ def parse_keycodes(keys_parameter):
             key_str = ALIASES[key_str]
 
         # Parsing
-        if re.fullmatch("^[0-9]+$", key_str):  # Single keycode
+        if re.fullmatch("^fn$", key_str):  # Special keycode "fn"
+            keycodes.append("fn")
+        elif re.fullmatch("^[0-9]+$", key_str):  # Single keycode
             keycode = int(key_str)
             if keycode not in MSI_KEYMAP.keys():
                 raise LineParseError("%s is not a valid keycode." % key_str)
