@@ -1,6 +1,7 @@
 import re
-from msi_keyboard import MSI_KEYMAP
+from msi_keyboard import AVAILABLE_MSI_KEYMAPS
 
+DEFAULT_MODEL = "GE63"  # Default laptop model if nothing specified in the config file
 ALIASES = {"all": "9-133,fn",
            "f_row": "67-76,95,96",
            "arrows": "111,113,114,116",
@@ -21,6 +22,10 @@ class LineParseError(Exception):
     pass
 
 
+class UnknownModelError(Exception):
+    pass
+
+
 def load_config(config_path):
 
     try:
@@ -36,6 +41,8 @@ def load_config(config_path):
     except ConfigParseError as e:
         raise ConfigError("Parsing error : %s" % str(e)) from e
         pass
+    except UnknownModelError as e:
+        raise e
     except Exception as e:
         raise ConfigError("Unknown error : %s" % str(e)) from e
         pass
@@ -45,13 +52,27 @@ def load_config(config_path):
 
 def parse_config(f):
 
+    msi_keymap = parse_laptop_model(["model", DEFAULT_MODEL])
     colors_map = {}
+    warnings = []
 
     for i, line in enumerate(f):
 
         line = line.replace("\n", "")
 
         parameters = list(filter(None, line.split(' ')))
+
+        # Try parsing first line as laptop model definition
+        if i == 0:
+            try:
+                msi_keymap = parse_laptop_model(parameters)
+            except LineParseError:
+                warnings += ["No laptop model specified, assuming %s as default." % DEFAULT_MODEL]
+                pass
+            else:
+                continue
+
+        # Parsing a keys/color line
         if len(parameters) == 0:
             continue
         elif len(parameters) > 3:
@@ -59,7 +80,7 @@ def parse_config(f):
         else:
 
             try:
-                keycodes = parse_keycodes(parameters[0])
+                keycodes = parse_keycodes(msi_keymap, parameters[0])
                 parse_mode(parameters[1])
                 color = parse_color(parameters[2])
             except LineParseError as e:
@@ -68,10 +89,21 @@ def parse_config(f):
             else:
                 colors_map = update_colors_map(colors_map, keycodes, color)
 
-    return colors_map
+    return msi_keymap, colors_map, warnings
 
 
-def parse_keycodes(keys_parameter):
+def parse_laptop_model(parameters):
+
+    if len(parameters) == 2 and parameters[0] == "model":
+        for msi_models, msi_keymap in AVAILABLE_MSI_KEYMAPS:
+            if parameters[1] in msi_models:
+                return msi_keymap
+        raise UnknownModelError(parameters[1])
+    else:
+        raise LineParseError
+
+
+def parse_keycodes(msi_keymap, keys_parameter):
 
     keycodes = []
 
@@ -87,16 +119,16 @@ def parse_keycodes(keys_parameter):
             keycodes.append("fn")
         elif re.fullmatch("^[0-9]+$", key_str):  # Single keycode
             keycode = int(key_str)
-            if keycode not in MSI_KEYMAP.keys():
+            if keycode not in msi_keymap.keys():
                 raise LineParseError("%s is not a valid keycode." % key_str)
             else:
                 keycodes.append(keycode)
         elif re.fullmatch("^[0-9]+-[0-9]+$", key_str):  # Keycode range
             keycode_1, keycode_2 = [int(s) for s in key_str.split('-')]
-            if keycode_2 <= keycode_1 or keycode_1 not in MSI_KEYMAP.keys() or keycode_2 not in MSI_KEYMAP.keys():
+            if keycode_2 <= keycode_1 or keycode_1 not in msi_keymap.keys() or keycode_2 not in msi_keymap.keys():
                 raise LineParseError("%s is not a valid keycode range." % key_str)
             else:
-                new_keycodes = [k for k in range(keycode_1, keycode_2+1) if k in MSI_KEYMAP.keys()]
+                new_keycodes = [k for k in range(keycode_1, keycode_2+1) if k in msi_keymap.keys()]
                 keycodes += new_keycodes
         else:
             raise LineParseError("%s is not a keycode, nor a keycode range, nor an alias." % key_str)
