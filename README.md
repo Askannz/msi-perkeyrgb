@@ -1,7 +1,9 @@
 msi-perkeyrgb
 ==================
 
-This progam allows to control the SteelSeries per-key RGB keyboard backlighting on MSI laptops such as the GE63VR. This is an unofficial tool, I am nor related to MSI not SteelSeries in any way. It *will not work* on models with region-based backlighting (such as GE62VR and others). For those you should use tools like [MSIKLM](https://github.com/Gibtnix/MSIKLM).
+This progam allows to control the SteelSeries per-key RGB keyboard backlighting on MSI laptops such as the GE63VR. It *will not work* on models with region-based backlighting (such as GE62VR and others). For those you should use tools like [MSIKLM](https://github.com/Gibtnix/MSIKLM).
+
+This is an unofficial tool, I am not related to MSI nor SteelSeries in any way.
 
 Command-line options
 ----------
@@ -53,6 +55,18 @@ cd msi-perkeyrgb/
 chmod +x msi-perkeyrgb
 ```
 
+Permissions
+----------
+
+**IMPORTANT** : you must either
+
+* run the program as root
+
+**OR**
+
+* give yourself read/write permissions to the HID interface. This interface is shown as `/dev/hidraw*` where `*` can be 0, 1, 2... (there can be more than one if you have a USB mouse or keyboard plugged in). Find the right one (try them all if necessary) and give yourself permissions with `# chmod 666 /dev/hidraw*`.
+
+
 Usage
 ----------
 
@@ -96,16 +110,6 @@ Only WASD keys (for US layout) lit up in red.
 25,38,39,40 steady ff0000
 ```
 
-#### Permissions
-
-**IMPORTANT** : you must either
-
-* run the program as root
-
-**OR**
-
-* give yourself read/write permissions to the HID interface. This interface is shown as `/dev/hidraw*` where `*` can be 0, 1, 2... (there can be more than one if you have a USB mouse or keyboard plugged in). Find the right one (try them all if necessary) and give yourself permissions with `# chmod 666 /dev/hidraw*`.
-
 #### Command-line usage
 
 ```
@@ -119,7 +123,7 @@ The SteelSeries keyboard is connected to the MSI laptop by two independent inter
 * A PS/2 interface to send keypresses
 * a USB HID-compliant interface to receive RGB commands
 
-On my laptop, the USB interface has the vendor/product ID 0x1038:0x1122. It should be the same for other models, but if it is not, you can specify it yourself with the `--id` option (see above).
+On my laptop (GE63VR), the USB interface has the vendor/product ID 0x1038:0x1122. It should be the same for other models, but if it is not, you can specify it yourself with the `--id` option (see above).
 
 I used Wireshark to capture the USB traffic between the SteelSeries Engine on Windows and the keyboard. Then it was a matter of figuring out the protocol used. Due to a lack of time, I have only been able to reverse-engineer the "Steady" mode for each key. Feel free to improve on this work, I will review pull requests.
 
