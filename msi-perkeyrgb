@@ -3,8 +3,8 @@
 import sys
 import argparse
 import re
-from config import load_config, ConfigError
-from msi_keyboard import MSI_Keyboard
+from config import load_config, ConfigError, UnknownModelError
+from msi_keyboard import MSI_Keyboard, AVAILABLE_MSI_KEYMAPS
 from hidapi_wrapping import HIDLibraryError, HIDNotFoundError, HIDOpenError
 
 VERSION = "1.0"
@@ -32,13 +32,24 @@ else:
             id_str = DEFAULT_ID
 
         try:
-            colors_map = load_config(args.config)
+            msi_keymap, colors_map, warnings = load_config(args.config)
+        except UnknownModelError as e:
+            print("Error parsing laptop model : unknown model %s" % str(e))
+            print("Known models are :")
+            for msi_models, _ in AVAILABLE_MSI_KEYMAPS:
+                for model in msi_models:
+                    print(model)
+            print("\nIf your laptop is not in this list, use the closest one (with a keyboard layout as similar as possible). This tool will only work with per-key RGB models.")
         except ConfigError as e:
             print("Error reading config file : %s" % str(e))
         else:
 
+            # Printings config parse warnings
+            for w in warnings:
+                print("Warning :", w)
+
             try:
-                kb = MSI_Keyboard(id_str)
+                kb = MSI_Keyboard(id_str, msi_keymap)
             except HIDLibraryError as e:
                 print("Cannot open HIDAPI library : %s. Make sure you have installed libhidapi on your system, then try running \"sudo ldconfig\" to regenerate library cache." % str(e))
             except HIDNotFoundError:

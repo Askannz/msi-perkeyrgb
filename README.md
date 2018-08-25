@@ -70,7 +70,27 @@ Permissions
 Usage
 ----------
 
-You must write your RGB configuration in a file. Each line should have the following syntax :
+You must write your RGB configuration in a file.
+
+**First line** of the configuration file should have the following syntax :
+
+```
+model <laptop model> 
+```
+
+Where `<laptop model>` is any of the following :
+
+	GE63
+	GE73
+	GS63
+	GS73
+	GX63
+	GT63
+
+If your laptop is not in this list, put the closest one or a model with a similar keyboard layout.
+
+
+**Other lines** have the following syntax :
 
 ```
 <keycodes> <mode> <mode options>
