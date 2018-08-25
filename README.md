@@ -120,6 +120,7 @@ If the same key is configured differently by multiple lines, the lowest line tak
 
 All keys white except yellow arrows and orange "Fn" key.
 ```
+model GE63
 all steady ffffff
 arrows steady ffff00
 fn steady ffc800
@@ -127,6 +128,7 @@ fn steady ffc800
 
 Only WASD keys (for US layout) lit up in red.
 ```
+model GS65
 25,38,39,40 steady ff0000
 ```
 
