@@ -56,11 +56,11 @@ def main():
                     print("Cannot open HIDAPI library : %s. Make sure you have installed libhidapi on your system, then try running \"sudo ldconfig\" to regenerate library cache." % str(e))
                 except HIDNotFoundError:
                     if not args.id:
-                        print("No MSI keyboards with a known product/vendor IDs were found. However, if you think your keyboard should work with this program, you can try overriding the ID by adding the option \"--id VENDOR_ID:PRODUCT_ID\"")
+                        print("No MSI keyboards with a known product/vendor IDs were found. However, if you think your keyboard should work with this program, you can try overriding the ID by adding the option \"--id VENDOR_ID:PRODUCT_ID\". In that case you will also need to give yourself proper read/write permissions to the corresponding /dev/hidraw* device.")
                     else:
                         print("No USB device with ID %s found." % id_str)
                 except HIDOpenError:
-                    print("Cannot open keyboard. Possible causes :\n- You don't have permissions to open the HID device. Run this program as root, or give yourself read/write permissions to the corresponding /dev/hidraw*.\n- USB device with id %s is not a HID device." % id_str)
+                    print("Cannot open keyboard. Possible causes :\n- You don't have permissions to open the HID device. Run this program as root, or give yourself read/write permissions to the corresponding /dev/hidraw*. If you have just installed this tool, reboot your computer for the udev rule to take effect.\n- USB device with id %s is not a HID device." % id_str)
                 else:
                     kb.set_color_all([0, 0, 0])
                     kb.set_colors(colors_map)
