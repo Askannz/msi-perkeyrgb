@@ -3,7 +3,7 @@ from os.path import exists
 from os import popen
 import ctypes as ct
 import re
-from hidapi_types import set_hidapi_types
+from msi_perkeyrgb.hidapi_types import set_hidapi_types
 
 DELAY = 0.01
 

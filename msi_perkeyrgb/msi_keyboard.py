@@ -1,6 +1,6 @@
 import random
-from hidapi_wrapping import HID_Keyboard
-from protocol import make_key_colors_packet, make_refresh_packet
+from msi_perkeyrgb.hidapi_wrapping import HID_Keyboard
+from msi_perkeyrgb.protocol import make_key_colors_packet, make_refresh_packet
 
 AVAILABLE_MSI_KEYMAPS = [
              (["GE63", "GE73", "GS63", "GS73", "GX63", "GT63"],

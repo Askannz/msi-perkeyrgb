@@ -1,5 +1,5 @@
 import re
-from msi_keyboard import AVAILABLE_MSI_KEYMAPS
+from msi_perkeyrgb.msi_keyboard import AVAILABLE_MSI_KEYMAPS
 
 DEFAULT_MODEL = "GE63"  # Default laptop model if nothing specified in the config file
 ALIASES = {"all": "9-133,fn",

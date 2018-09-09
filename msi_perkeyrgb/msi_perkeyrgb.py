@@ -3,9 +3,9 @@
 import sys
 import argparse
 import re
-from config import load_config, ConfigError, UnknownModelError
-from msi_keyboard import MSI_Keyboard, AVAILABLE_MSI_KEYMAPS
-from hidapi_wrapping import HIDLibraryError, HIDNotFoundError, HIDOpenError
+from msi_perkeyrgb.config import load_config, ConfigError, UnknownModelError
+from msi_perkeyrgb.msi_keyboard import MSI_Keyboard, AVAILABLE_MSI_KEYMAPS
+from msi_perkeyrgb.hidapi_wrapping import HIDLibraryError, HIDNotFoundError, HIDOpenError
 
 VERSION = "1.0"
 DEFAULT_ID = "1038:1122"
