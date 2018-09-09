@@ -16,7 +16,7 @@ setup(
     py_modules=['msi-perkeyrgb'],
     entry_points={
         'console_scripts': [
-            'msi-perkeyrgb=msi_perkeyrgb:main',
+            'msi-perkeyrgb=msi_perkeyrgb.msi_perkeyrgb:main',
         ],
     },
     keywords=['msi', 'rgb', 'keyboard', 'per-key'],
