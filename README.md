@@ -3,7 +3,23 @@ msi-perkeyrgb
 
 This progam allows to control the SteelSeries per-key RGB keyboard backlighting on MSI laptops such as the GE63VR. It *will not work* on models with region-based backlighting (such as GE62VR and others). For those you should use tools like [MSIKLM](https://github.com/Gibtnix/MSIKLM).
 
-This is an unofficial tool, I am not related to MSI nor SteelSeries in any way.
+This is an unofficial tool, I am not affiliated to MSI nor SteelSeries in any way.
+
+
+Installation
+----------
+
+```
+git clone https://github.com/Askannz/msi-perkeyrgb
+cd msi-perkeyrgb/
+sudo python setup.py install
+sudo cp 99-msi-rgb.rules /etc/udev/rules.d/
+```
+
+If you are on Archlinux, use this AUR package : [msi-perkeyrgb](https://aur.archlinux.org/packages/msi-perkeyrgb/)
+
+After installation, you must reboot your computer (necessary for the udev rule to take effect, if you don't you will run into permission problems)
+
 
 Command-line options
 ----------
@@ -46,30 +62,13 @@ Requirements
 	* **Archlinux** : `# pacman -S hidapi`
 	* **Ubuntu** : `# apt install libhidapi-hidraw0`
 
-Installation
-----------
-
-```
-git clone https://github.com/Askannz/msi-perkeyrgb
-cd msi-perkeyrgb/
-sudo python setup.py install
-sudo cp 99-msi-rgb.rules /etc/udev/rules.d/
-```
-
-If you are on Archlinux, use this AUR package : [msi-perkeyrgb](https://aur.archlinux.org/packages/msi-perkeyrgb/)
-
-After installation, you must reboot your computer (necessary for the udev rule to take effect, if you don't you will run into permission problems)
 
 Permissions
 ----------
 
-**IMPORTANT** : you must either
+**IMPORTANT** : you need to have read/write access to the HID interface of your keyboard. The included udev rule should take care of that, but here are some instructions just in case :
 
-* run the program as root
-
-**OR**
-
-* give yourself read/write permissions to the HID interface. This interface is shown as `/dev/hidraw*` where `*` can be 0, 1, 2... (there can be more than one if you have a USB mouse or keyboard plugged in). Find the right one (try them all if necessary) and give yourself permissions with `# chmod 666 /dev/hidraw*`.
+The HID interface is shown as `/dev/hidraw*` where `*` can be 0, 1, 2... (there can be more than one if you have a USB mouse or keyboard plugged in). Find the right one (try them all if necessary) and give yourself permissions with `# chmod 666 /dev/hidraw*`.
 
 
 Usage
