@@ -52,7 +52,7 @@ Installation
 ```
 git clone https://github.com/Askannz/msi-perkeyrgb
 cd msi-perkeyrgb/
-chmod +x msi-perkeyrgb
+python setup.py install
 ```
 
 Permissions
