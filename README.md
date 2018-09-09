@@ -55,6 +55,10 @@ cd msi-perkeyrgb/
 python setup.py install
 ```
 
+If you are on Archlinux, use this AUR package : [msi-perkeyrgb](https://aur.archlinux.org/packages/msi-perkeyrgb/)
+
+After installation, you must reboot your computer (necessary for the udev rule to take effect, if you don't you will run into permission problems)
+
 Permissions
 ----------
 
