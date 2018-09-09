@@ -9,7 +9,7 @@ Command-line options
 ----------
 
 ```
-usage: msi-perkeyrgb.py [-h] [-v] [-c FILEPATH] [--id VENDOR_ID:PRODUCT_ID]
+usage: msi_perkeyrgb.py [-h] [-v] [-c FILEPATH] [--id VENDOR_ID:PRODUCT_ID]
 
 Tool to control per-key RGB keyboard backlighting on MSI laptops.
 https://github.com/Askannz/msi-perkeyrgb
