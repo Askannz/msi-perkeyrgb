@@ -13,7 +13,7 @@ setup(
     author='Robin Lange',
     author_email='robin.langenc@gmail.com',
     license='MIT',
-    py_modules=['msi-perkeyrgb'],
+    py_modules=['msi_perkeyrgb'],
     entry_points={
         'console_scripts': [
             'msi-perkeyrgb=msi_perkeyrgb.msi_perkeyrgb:main',
