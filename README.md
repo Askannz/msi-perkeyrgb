@@ -52,7 +52,8 @@ Installation
 ```
 git clone https://github.com/Askannz/msi-perkeyrgb
 cd msi-perkeyrgb/
-python setup.py install
+sudo python setup.py install
+sudo cp 99-msi-rgb.rules /etc/udev/rules.d/
 ```
 
 If you are on Archlinux, use this AUR package : [msi-perkeyrgb](https://aur.archlinux.org/packages/msi-perkeyrgb/)
