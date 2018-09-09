@@ -139,7 +139,7 @@ model GS65
 #### Command-line usage
 
 ```
-./msi-perkeyrgb -c <path to your configuration file>
+msi-perkeyrgb -c <path to your configuration file>
 ```
 
 How does it work ?
