@@ -36,17 +36,24 @@ optional arguments:
   -c FILEPATH, --config FILEPATH
                         Loads the configuration file located at FILEPATH.
                         Refer to the README for syntax.
+  -d, --disable         Disable RGB lighting.
   --id VENDOR_ID:PRODUCT_ID
                         This argument allows you to specify the vendor/product
                         id of your keyboard. You should not have to use this
                         unless opening the keyboard fails with the default
                         value. IDs are in hexadecimal format (example :
                         1038:1122)
+  --list-presets        List available presets for the given laptop model.
+  -p PRESET, --preset PRESET
+                        Use vendor preset. Presets can be applied in
+                        conjunction with configuration file.
 ```
 
 Features
 ----------
 Only "Steady" mode (fixed color for each key) is available for now, as I have not figured out the rest of the USB protocol yet. I will add more features later if enough people are interested.
+
+Presets are available for supported models (GS65), which emulate vendor-provided SteelSeries configurations.
 
 
 Compatibility
