@@ -55,7 +55,6 @@ class HID_Keyboard:
             raise HIDOpenError
 
     def send_feature_report(self, data):
-
         ret = self._hidapi.hid_send_feature_report(self._device, bytes(data), len(data))
         sleep(DELAY)  # The RGB controller derps if commands are sent too fast.
 
