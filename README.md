@@ -25,7 +25,8 @@ Command-line options
 ----------
 
 ```
-usage: msi-perkeyrgb [-h] [-v] [-c FILEPATH] [--id VENDOR_ID:PRODUCT_ID]
+usage: msi-perkeyrgb [-h] [-v] [-c FILEPATH] [-d] [--id VENDOR_ID:PRODUCT_ID]
+                     [--list-presets] [-p PRESET] [-m MODEL] [--list-models]
 
 Tool to control per-key RGB keyboard backlighting on MSI laptops.
 https://github.com/Askannz/msi-perkeyrgb
@@ -47,11 +48,15 @@ optional arguments:
   -p PRESET, --preset PRESET
                         Use vendor preset. Presets can be applied in
                         conjunction with configuration file.
+  -m MODEL, --model MODEL
+                        Set laptop model (see --list-models). If not
+                        specified, will use GE63 ad default.
+  --list-models         List available laptop models.
 ```
 
 Features
 ----------
-Only "Steady" mode (fixed color for each key) is available for now, as I have not figured out the rest of the USB protocol yet. I will add more features later if enough people are interested.
+For per-key configuration, only "Steady" mode (fixed color for each key) is available for now, as I have not figured out the rest of the USB protocol yet. I will add more features later if enough people are interested.
 
 Presets are available for supported models (GS65), which emulate vendor-provided SteelSeries configurations.
 
@@ -59,7 +64,7 @@ Presets are available for supported models (GS65), which emulate vendor-provided
 Compatibility
 ----------
 
-As of now, this tool was only tested on the GE63VR model. However, it should probably work on any recent MSI laptop with a per-key RGB keyboard. Please let me know if it works for your particular model, so that I can create a compatibility list.
+This tool should probably work on any recent MSI laptop with a per-key RGB keyboard. Please let me know if it works for your particular model, so that I can create a compatibility list.
 
 Requirements
 ----------
@@ -81,27 +86,18 @@ The HID interface is shown as `/dev/hidraw*` where `*` can be 0, 1, 2... (there 
 Usage
 ----------
 
-You must write your RGB configuration in a file.
+```
+msi-perkeyrgb --model <MSI model> -p <preset>
+```
+(see `--list-presets` for available options)
 
-**First line** of the configuration file should have the following syntax :
+**or**
 
 ```
-model <laptop model> 
+msi-perkeyrgb --model <MSI model> -c <path to your configuration file>
 ```
 
-Where `<laptop model>` is any of the following :
-
-	GE63
-	GE73
-	GS63
-	GS73
-	GX63
-	GT63
-
-If your laptop is not in this list, put the closest one or a model with a similar keyboard layout.
-
-
-**Other lines** have the following syntax :
+Each line of the configuration file must have the following syntax :
 
 ```
 <keycodes> <mode> <mode options>
@@ -127,11 +123,12 @@ If your laptop is not in this list, put the closest one or a model with a simila
 
 If the same key is configured differently by multiple lines, the lowest line takes priority.
 
+Lines prefixed with `#` are ignored.
+
 #### Examples
 
 All keys white except yellow arrows and orange "Fn" key.
 ```
-model GE63
 all steady ffffff
 arrows steady ffff00
 fn steady ffc800
@@ -139,7 +136,6 @@ fn steady ffc800
 
 Only WASD keys (for US layout) lit up in red.
 ```
-model GS65
 25,38,39,40 steady ff0000
 ```
 
