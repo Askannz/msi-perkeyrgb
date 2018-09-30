@@ -10,6 +10,10 @@ class UnknownIdError(Exception):
     pass
 
 
+class UnknownPresetError(Exception):
+    pass
+
+
 def parse_model(model_arg):
 
     model_arg_nocase = model_arg.upper()
@@ -28,3 +32,11 @@ def parse_usb_id(id_arg):
         return (vid, pid)
     else:
         raise UnknownIdError(id_arg)
+
+
+def parse_preset(preset_arg, msi_presets):
+
+    if preset_arg in msi_presets.keys():
+        return preset_arg
+    else:
+        raise UnknownPresetError(preset_arg)

@@ -3,7 +3,7 @@
 import sys
 import argparse
 from msi_perkeyrgb.config import load_config, ConfigError
-from msi_perkeyrgb.parsing import parse_model, parse_usb_id, UnknownModelError, UnknownIdError
+from msi_perkeyrgb.parsing import parse_model, parse_usb_id, parse_preset, UnknownModelError, UnknownIdError, UnknownPresetError
 from msi_perkeyrgb.msi_keyboard import MSI_Keyboard, AVAILABLE_MSI_KEYMAPS
 from msi_perkeyrgb.hidapi_wrapping import HIDLibraryError, HIDNotFoundError, HIDOpenError
 
@@ -59,14 +59,14 @@ def main():
                 sys.exit(1)
 
         # Loading presets
-        presets = MSI_Keyboard.get_model_presets(msi_model)
+        msi_presets = MSI_Keyboard.get_model_presets(msi_model)
 
         if args.list_presets:
-            if presets == {}:
+            if msi_presets == {}:
                 print("No presets available for %s." % msi_model)
             else:
                 print("Available presets for %s:" % msi_model)
-                for preset in presets.keys():
+                for preset in msi_presets.keys():
                     print("\t- %s" % preset)
 
         else:
@@ -76,7 +76,7 @@ def main():
 
             # Loading keyboard
             try:
-                kb = MSI_Keyboard(usb_id, msi_keymap)
+                kb = MSI_Keyboard(usb_id, msi_keymap, msi_presets)
             except HIDLibraryError as e:
                 print("Cannot open HIDAPI library : %s. Make sure you have installed libhidapi on your system, then try running \"sudo ldconfig\" to regenerate library cache." % str(e))
                 sys.exit(1)
@@ -90,18 +90,23 @@ def main():
                 print("Cannot open keyboard. Possible causes :\n- You don't have permissions to open the HID device. Run this program as root, or give yourself read/write permissions to the corresponding /dev/hidraw*. If you have just installed this tool, reboot your computer for the udev rule to take effect.\n- USB device with id %s is not a HID device." % id_str)
                 sys.exit(1)
 
+            # If user has requested disabling
             if args.disable:
                 kb.set_color_all([0, 0, 0])
                 kb.refresh()
 
+            # If user has requested a preset
             elif args.preset:
                 try:
-                    kb.set_msi_preset(msi_model, presets[args.preset])
-                except KeyError:
+                    preset = parse_preset(args.preset, msi_presets)
+                except UnknownPresetError:
                     print("Preset %s not found for model %s. Use --list-presets for available options" % (args.preset, msi_model))
                     sys.exit(1)
+
+                kb.set_preset(preset)
                 kb.refresh()
 
+            # If user has requested to load a config file
             elif args.config:
                 try:
                     colors_map, warnings = load_config(args.config, msi_keymap)
@@ -115,6 +120,7 @@ def main():
                 kb.set_colors(colors_map)
                 kb.refresh()
 
+            # If user has not requested anything
             else:
                 print("Nothing to do ! Please specify a preset or a config file.")
 

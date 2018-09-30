@@ -33,10 +33,11 @@ class MSI_Keyboard:
         except FileNotFoundError:
             return {}
 
-    def __init__(self, usb_id, msi_keymap):
+    def __init__(self, usb_id, msi_keymap, msi_presets):
 
         self._hid_keyboard = HID_Keyboard(usb_id)
         self._msi_keymap = msi_keymap
+        self._msi_presets = msi_presets
 
     def set_color_all(self, color):
 
@@ -89,9 +90,11 @@ class MSI_Keyboard:
             key_colors_packet = make_key_colors_packet(region, region_colors_map)
             self._hid_keyboard.send_feature_report(key_colors_packet)
 
-    def set_msi_preset(self, msi_model, preset):
-        for feature_report in preset:
-            self._hid_keyboard.send_feature_report(bytearray.fromhex(feature_report))
+    def set_preset(self, preset):
+
+        feature_reports_list = self._msi_presets[preset]
+        for data in feature_reports_list:
+            self._hid_keyboard.send_feature_report(bytearray.fromhex(data))
 
     def refresh(self):
 
