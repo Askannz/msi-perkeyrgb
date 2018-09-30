@@ -1,4 +1,6 @@
+import os
 import random
+import json
 from msi_perkeyrgb.hidapi_wrapping import HID_Keyboard
 from msi_perkeyrgb.protocol import make_key_colors_packet, make_refresh_packet
 
@@ -16,10 +18,26 @@ REGION_KEYCODES = {"alphanum": [0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 
 
 class MSI_Keyboard:
 
-    def __init__(self, id_str, msi_keymap):
+    @staticmethod
+    def get_model_keymap(msi_model):
+        for msi_models, msi_keymap in AVAILABLE_MSI_KEYMAPS:
+            if msi_model in msi_models:
+                return msi_keymap
 
-        self._hid_keyboard = HID_Keyboard(id_str)
+    @staticmethod
+    def get_model_presets(msi_model):
+        presets_path = os.path.join(os.path.dirname(__file__), 'presets/{}.json'.format(msi_model))
+        try:
+            f = open(presets_path)
+            return json.load(f)
+        except FileNotFoundError:
+            return {}
+
+    def __init__(self, usb_id, msi_keymap, msi_presets):
+
+        self._hid_keyboard = HID_Keyboard(usb_id)
         self._msi_keymap = msi_keymap
+        self._msi_presets = msi_presets
 
     def set_color_all(self, color):
 
@@ -71,6 +89,12 @@ class MSI_Keyboard:
         for region, region_colors_map in maps_sorted_by_region.items():
             key_colors_packet = make_key_colors_packet(region, region_colors_map)
             self._hid_keyboard.send_feature_report(key_colors_packet)
+
+    def set_preset(self, preset):
+
+        feature_reports_list = self._msi_presets[preset]
+        for data in feature_reports_list:
+            self._hid_keyboard.send_feature_report(bytearray.fromhex(data))
 
     def refresh(self):
 

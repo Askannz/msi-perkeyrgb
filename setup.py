@@ -19,6 +19,7 @@ setup(
             'msi-perkeyrgb=msi_perkeyrgb.msi_perkeyrgb:main',
         ],
     },
+    package_data={'msi_perkeyrgb': ['presets/*.json']},
     keywords=['msi', 'rgb', 'keyboard', 'per-key'],
     classifiers=[
         'License :: OSI Approved :: MIT License',

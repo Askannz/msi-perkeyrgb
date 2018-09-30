@@ -1,7 +1,5 @@
 import re
-from msi_perkeyrgb.msi_keyboard import AVAILABLE_MSI_KEYMAPS
 
-DEFAULT_MODEL = "GE63"  # Default laptop model if nothing specified in the config file
 ALIASES = {"all": "9-133,fn",
            "f_row": "67-76,95,96",
            "arrows": "111,113,114,116",
@@ -26,11 +24,11 @@ class UnknownModelError(Exception):
     pass
 
 
-def load_config(config_path):
+def load_config(config_path, msi_keymap):
 
     try:
         f = open(config_path, "r")
-        colors_map = parse_config(f)
+        config_map = parse_config(f, msi_keymap)
         f.close()
     except IOError as e:
         raise ConfigError("IOError : %s" % str(e)) from e
@@ -47,12 +45,11 @@ def load_config(config_path):
         raise ConfigError("Unknown error : %s" % str(e)) from e
         pass
     else:
-        return colors_map
+        return config_map
 
 
-def parse_config(f):
+def parse_config(f, msi_keymap):
 
-    msi_keymap = parse_laptop_model(["model", DEFAULT_MODEL])
     colors_map = {}
     warnings = []
 
@@ -60,17 +57,14 @@ def parse_config(f):
 
         line = line.replace("\n", "")
 
+        if line.replace(" ", "")[0] == "#":
+            continue
+
         parameters = list(filter(None, line.split(' ')))
 
-        # Try parsing first line as laptop model definition
-        if i == 0:
-            try:
-                msi_keymap = parse_laptop_model(parameters)
-            except LineParseError:
-                warnings += ["No laptop model specified, assuming %s as default." % DEFAULT_MODEL]
-                pass
-            else:
-                continue
+        if i == 0 and parameters[0] == "model":
+            warnings += ["Passing the laptop model in the configuration file is deprecated, use the --model option instead."]
+            continue
 
         # Parsing a keys/color line
         if len(parameters) == 0:
@@ -89,18 +83,7 @@ def parse_config(f):
             else:
                 colors_map = update_colors_map(colors_map, keycodes, color)
 
-    return msi_keymap, colors_map, warnings
-
-
-def parse_laptop_model(parameters):
-
-    if len(parameters) == 2 and parameters[0] == "model":
-        for msi_models, msi_keymap in AVAILABLE_MSI_KEYMAPS:
-            if parameters[1] in msi_models:
-                return msi_keymap
-        raise UnknownModelError(parameters[1])
-    else:
-        raise LineParseError
+    return colors_map, warnings
 
 
 def parse_keycodes(msi_keymap, keys_parameter):
