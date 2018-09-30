@@ -1,9 +1,5 @@
 import re
-import json
-import os
-from msi_perkeyrgb.msi_keyboard import AVAILABLE_MSI_KEYMAPS
 
-DEFAULT_MODEL = "GE63"  # Default laptop model if nothing specified in the config file
 ALIASES = {"all": "9-133,fn",
            "f_row": "67-76,95,96",
            "arrows": "111,113,114,116",
@@ -28,11 +24,11 @@ class UnknownModelError(Exception):
     pass
 
 
-def load_config(config_path):
+def load_config(config_path, msi_keymap):
 
     try:
         f = open(config_path, "r")
-        config_map = parse_config(f)
+        config_map = parse_config(f, msi_keymap)
         f.close()
     except IOError as e:
         raise ConfigError("IOError : %s" % str(e)) from e
@@ -52,10 +48,8 @@ def load_config(config_path):
         return config_map
 
 
-def parse_config(f):
+def parse_config(f, msi_keymap):
 
-    msi_model = parse_laptop_model(["model", DEFAULT_MODEL])
-    msi_keymap = get_model_keymap(msi_model)
     colors_map = {}
     warnings = []
 
@@ -65,16 +59,9 @@ def parse_config(f):
 
         parameters = list(filter(None, line.split(' ')))
 
-        # Try parsing first line as laptop model definition
-        if i == 0:
-            try:
-                msi_model = parse_laptop_model(parameters)
-                msi_keymap = get_model_keymap(msi_model)
-            except LineParseError:
-                warnings += ["No laptop model specified, assuming %s as default." % DEFAULT_MODEL]
-                pass
-            else:
-                continue
+        if i == 0 and parameters[0] == "model":
+            warnings += ["Passing the laptop model in the configuration file is deprecated, use the --model option instead."]
+            continue
 
         # Parsing a keys/color line
         if len(parameters) == 0:
@@ -93,31 +80,7 @@ def parse_config(f):
             else:
                 colors_map = update_colors_map(colors_map, keycodes, color)
 
-    return msi_model, msi_keymap, colors_map, warnings
-
-
-def parse_laptop_model(parameters):
-
-    if len(parameters) == 2 and parameters[0] == "model":
-        return parameters[1]
-    else:
-        raise LineParseError
-
-
-def get_model_keymap(msi_model):
-    for msi_models, msi_keymap in AVAILABLE_MSI_KEYMAPS:
-        if msi_model in msi_models:
-            return msi_keymap
-    raise UnknownModelError(msi_model)
-
-
-def get_model_presets(msi_model):
-    presets_path = os.path.join(os.path.dirname(__file__), 'presets/{}.json'.format(msi_model))
-    with open(presets_path) as presets_json:
-        try:
-            return json.load(presets_json)
-        except FileNotFoundError:
-            raise UnknownModelError("No presets for model %s" % msi_model)
+    return colors_map, warnings
 
 
 def parse_keycodes(msi_keymap, keys_parameter):

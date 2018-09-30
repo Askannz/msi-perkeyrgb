@@ -1,3 +1,4 @@
+import os
 import random
 import json
 from msi_perkeyrgb.hidapi_wrapping import HID_Keyboard
@@ -15,15 +16,26 @@ REGION_KEYCODES = {"alphanum": [0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 
                    "numpad": [0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5a, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f, 0x60, 0x61, 0x62, 0x63, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]}
 
 
-class UnknownPresetError(Exception):
-    pass
-
-
 class MSI_Keyboard:
 
-    def __init__(self, id_str, msi_keymap):
+    @staticmethod
+    def get_model_keymap(msi_model):
+        for msi_models, msi_keymap in AVAILABLE_MSI_KEYMAPS:
+            if msi_model in msi_models:
+                return msi_keymap
 
-        self._hid_keyboard = HID_Keyboard(id_str)
+    @staticmethod
+    def get_model_presets(msi_model):
+        presets_path = os.path.join(os.path.dirname(__file__), 'presets/{}.json'.format(msi_model))
+        try:
+            f = open(presets_path)
+            return json.load(f)
+        except FileNotFoundError:
+            return {}
+
+    def __init__(self, usb_id, msi_keymap):
+
+        self._hid_keyboard = HID_Keyboard(usb_id)
         self._msi_keymap = msi_keymap
 
     def set_color_all(self, color):

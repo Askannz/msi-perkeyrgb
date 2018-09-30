@@ -26,7 +26,7 @@ class HIDSendError(Exception):
 
 class HID_Keyboard:
 
-    def __init__(self, id_str):
+    def __init__(self, usb_id):
 
         # Locating HIDAPI library
         s = popen("ldconfig -p").read()
@@ -44,11 +44,14 @@ class HID_Keyboard:
         set_hidapi_types(self._hidapi)
 
         # Checking if the USB device corresponding to the keyboard exists
+        vid, pid = usb_id
+        vid_str = hex(vid)[2:].zfill(4)
+        pid_str = hex(pid)[2:].zfill(4)
+        id_str = vid_str + ":" + pid_str
         s = popen("lsusb").read()
         if s.find(id_str) == -1:
             raise HIDNotFoundError
 
-        vid, pid = [int(s, 16) for s in id_str.split(':')]
         self._device = self._hidapi.hid_open(vid, pid, ct.c_wchar_p(0))
 
         if self._device is None:
