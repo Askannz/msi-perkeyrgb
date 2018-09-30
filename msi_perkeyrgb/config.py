@@ -57,6 +57,9 @@ def parse_config(f, msi_keymap):
 
         line = line.replace("\n", "")
 
+        if line.replace(" ", "")[0] == "#":
+            continue
+
         parameters = list(filter(None, line.split(' ')))
 
         if i == 0 and parameters[0] == "model":
