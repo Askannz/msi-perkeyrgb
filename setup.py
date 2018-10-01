@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='msi-perkeyrgb',
-    version='1.0',
+    version='1.1',
     description='Configuration tool for per-key RGB keyboards on MSI laptops.',
     long_description=open(
         join(dirname(__file__), 'README.md')).read(),
