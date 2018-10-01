@@ -46,11 +46,10 @@ optional arguments:
                         1038:1122)
   --list-presets        List available presets for the given laptop model.
   -p PRESET, --preset PRESET
-                        Use vendor preset. Presets can be applied in
-                        conjunction with configuration file.
+                        Use vendor preset (see --list-presets).
   -m MODEL, --model MODEL
                         Set laptop model (see --list-models). If not
-                        specified, will use GE63 ad default.
+                        specified, will use GE63 as default.
   --list-models         List available laptop models.
 ```
 

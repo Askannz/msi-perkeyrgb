@@ -19,8 +19,8 @@ def main():
     parser.add_argument('-d', '--disable', action='store_true', help='Disable RGB lighting.')
     parser.add_argument('--id', action='store', metavar='VENDOR_ID:PRODUCT_ID', help='This argument allows you to specify the vendor/product id of your keyboard. You should not have to use this unless opening the keyboard fails with the default value. IDs are in hexadecimal format (example :  1038:1122)')
     parser.add_argument('--list-presets', action='store_true', help='List available presets for the given laptop model.')
-    parser.add_argument('-p', '--preset', action='store', help='Use vendor preset. Presets can be applied in conjunction with configuration file.')
-    parser.add_argument('-m', '--model', action='store', help='Set laptop model (see --list-models). If not specified, will use %s ad default.' % DEFAULT_MODEL)
+    parser.add_argument('-p', '--preset', action='store', help='Use vendor preset (see --list-presets).')
+    parser.add_argument('-m', '--model', action='store', help='Set laptop model (see --list-models). If not specified, will use %s as default.' % DEFAULT_MODEL)
     parser.add_argument('--list-models', action='store_true', help='List available laptop models.')
 
     args = parser.parse_args()
