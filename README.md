@@ -138,6 +138,12 @@ Only WASD keys (for US layout) lit up in red.
 25,38,39,40 steady ff0000
 ```
 
+#### Command-line usage
+
+```
+msi-perkeyrgb -c <path to your configuration file>
+```
+
 How does it work ?
 ----------
 
