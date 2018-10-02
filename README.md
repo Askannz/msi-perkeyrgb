@@ -69,7 +69,10 @@ Requirements
 ----------
 
 * Python 3.4+
-* libhidapi 0.8+.
+* setuptools
+  * **Archlinux** : `# pacman -S python-setuptools`
+  * **Ubuntu** : `# apt install python3-setuptools`
+* libhidapi 0.8+
 	* **Archlinux** : `# pacman -S hidapi`
 	* **Ubuntu** : `# apt install libhidapi-hidraw0`
 
