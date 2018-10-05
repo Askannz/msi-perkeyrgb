@@ -57,7 +57,7 @@ Features
 ----------
 For per-key configuration, only "Steady" mode (fixed color for each key) is available for now, as I have not figured out the rest of the USB protocol yet. I will add more features later if enough people are interested.
 
-Presets are available for supported models (GS65), which emulate vendor-provided SteelSeries configurations.
+Presets are available for supported models, which emulate vendor-provided SteelSeries configurations.
 
 
 Compatibility
