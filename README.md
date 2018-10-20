@@ -9,14 +9,16 @@ This is an unofficial tool, I am not affiliated to MSI nor SteelSeries in any wa
 Installation
 ----------
 
+If you are on Archlinux, use this AUR package : [msi-perkeyrgb](https://aur.archlinux.org/packages/msi-perkeyrgb/)
+
+For Ubuntu or others :
+
 ```
 git clone https://github.com/Askannz/msi-perkeyrgb
 cd msi-perkeyrgb/
-sudo python setup.py install
+sudo python3 setup.py install
 sudo cp 99-msi-rgb.rules /etc/udev/rules.d/
 ```
-
-If you are on Archlinux, use this AUR package : [msi-perkeyrgb](https://aur.archlinux.org/packages/msi-perkeyrgb/)
 
 After installation, you must reboot your computer (necessary for the udev rule to take effect, if you don't you will run into permission problems)
 
@@ -109,7 +111,7 @@ msi-perkeyrgb --model <MSI model> -p <preset>
 msi-perkeyrgb --model <MSI model> -c <path to your configuration file>
 ```
 
-Each line of the configuration file must have the following syntax :
+The configuration file can take any extension, but each line must have the following syntax :
 
 ```
 <keycodes> <mode> <mode options>
