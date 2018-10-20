@@ -63,7 +63,17 @@ Presets are available for supported models, which emulate vendor-provided SteelS
 Compatibility
 ----------
 
-This tool should probably work on any recent MSI laptop with a per-key RGB keyboard. Please let me know if it works for your particular model, so that I can create a compatibility list.
+This tool should probably work on any recent MSI laptop with a per-key RGB keyboard. It has been succesfully tested with the following models :
+
+| Model |
+| ----  |
+| GE63  |
+| GE73  |
+| GS63  |
+| GS65  |
+
+
+Please let me know if it works for your particular model, so that I can update this list.
 
 Requirements
 ----------
