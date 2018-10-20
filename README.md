@@ -12,7 +12,7 @@ Installation
 ```
 git clone https://github.com/Askannz/msi-perkeyrgb
 cd msi-perkeyrgb/
-sudo python setup.py install
+sudo python3 setup.py install
 sudo cp 99-msi-rgb.rules /etc/udev/rules.d/
 ```
 
@@ -138,6 +138,11 @@ If the same key is configured differently by multiple lines, the lowest line tak
 Lines prefixed with `#` are ignored.
 
 #### Examples
+
+Create file config
+```
+touch configKeyboard.py
+```
 
 All keys white except yellow arrows and orange "Fn" key.
 ```
