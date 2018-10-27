@@ -87,7 +87,7 @@ def main():
                     print("No USB device with ID %s found." % args.id)
                 sys.exit(1)
             except HIDOpenError:
-                print("Cannot open keyboard. Possible causes :\n- You don't have permissions to open the HID device. Run this program as root, or give yourself read/write permissions to the corresponding /dev/hidraw*. If you have just installed this tool, reboot your computer for the udev rule to take effect.\n- USB device with id %s is not a HID device." % id_str)
+                print("Cannot open keyboard. Possible causes :\n- You don't have permissions to open the HID device. Run this program as root, or give yourself read/write permissions to the corresponding /dev/hidraw*. If you have just installed this tool, reboot your computer for the udev rule to take effect.\n- USB device with id %s is not a HID device." % args.id)
                 sys.exit(1)
 
             # If user has requested disabling
