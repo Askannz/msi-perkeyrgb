@@ -50,13 +50,15 @@ def main():
 
         # Parse USB vendor/product ID
         if not args.id:
-            usb_id = parse_usb_id(DEFAULT_ID)
+            id_str = DEFAULT_ID
         else:
-            try:
-                usb_id = parse_usb_id(args.id)
-            except UnknownIdError:
-                print("Unknown vendor/product ID : %s" % args.id)
-                sys.exit(1)
+            id_str = args.id
+
+        try:
+            usb_id = parse_usb_id(id_str)
+        except UnknownIdError:
+            print("Unknown vendor/product ID : %s" % usb_id)
+            sys.exit(1)
 
         # Loading presets
         msi_presets = MSI_Keyboard.get_model_presets(msi_model)
