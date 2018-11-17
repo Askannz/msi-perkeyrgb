@@ -1,6 +1,7 @@
 import re
 
-ALIASES = {"all": "9-133,fn",
+ALIAS_ALL = "all"
+ALIASES = {ALIAS_ALL: "9-133,fn",
            "f_row": "67-76,95,96",
            "arrows": "111,113,114,116",
            "num_row": "10-21",
@@ -46,6 +47,24 @@ def load_config(config_path, msi_keymap):
         pass
     else:
         return config_map
+
+
+def load_steady(color, msi_keymap):
+    """Setup the key map to be all a steady color
+    """
+    colors_map = {}
+    warnings = []
+
+    try:
+        keycodes = parse_keycodes(msi_keymap, ALIAS_ALL)
+        color = parse_color(color)
+    except LineParseError as e:
+        raise ConfigParseError("Color parse error %s" % str(e)) from e
+        pass
+    else:
+        colors_map = update_colors_map(colors_map, keycodes, color)
+
+    return colors_map, warnings
 
 
 def parse_config(f, msi_keymap):
