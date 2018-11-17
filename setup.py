@@ -16,7 +16,7 @@ setup(
     packages=['msi_perkeyrgb'],
     entry_points={
         'console_scripts': [
-            'msi-perkeyrgb=msi_perkeyrgb.msi_perkeyrgb:main',
+            'msi-perkeyrgb=msi_perkeyrgb.main:main',
         ],
     },
     package_data={'msi_perkeyrgb': ['presets/*.json']},
