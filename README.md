@@ -29,6 +29,7 @@ Command-line options
 ```
 usage: msi-perkeyrgb [-h] [-v] [-c FILEPATH] [-d] [--id VENDOR_ID:PRODUCT_ID]
                      [--list-presets] [-p PRESET] [-m MODEL] [--list-models]
+                     [-s HEXCOLOR]
 
 Tool to control per-key RGB keyboard backlighting on MSI laptops.
 https://github.com/Askannz/msi-perkeyrgb
@@ -53,6 +54,9 @@ optional arguments:
                         Set laptop model (see --list-models). If not
                         specified, will use GE63 as default.
   --list-models         List available laptop models.
+  -s HEXCOLOR, --steady HEXCOLOR
+                        Set all of the keyboard to a steady html color, 
+                        ex. 00ff00 for green
 ```
 
 Features
