@@ -22,3 +22,7 @@ presets=(
 )
 
 selection=${presets[(( RANDOM % ${#presets[@]}+1 ))]}
+
+msi-perkeyrgb -m GS65 -p $selection
+
+exit 0
