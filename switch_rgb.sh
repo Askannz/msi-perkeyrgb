@@ -21,4 +21,4 @@ presets=(
     roulette
 )
 
-selection=${presets[((RANDOM % 10+1))]}
+selection=${presets[(( RANDOM % ${#presets[@]}+1 ))]}
