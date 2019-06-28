@@ -1,4 +1,5 @@
 import re
+import sys
 
 ALIAS_ALL = "all"
 ALIASES = {ALIAS_ALL: "9-133,fn",
@@ -26,9 +27,11 @@ class UnknownModelError(Exception):
 
 
 def load_config(config_path, msi_keymap):
-
     try:
-        f = open(config_path, "r")
+        if config_path == '-':
+            f = sys.stdin
+        else:
+            f = open(config_path, "r")
         config_map = parse_config(f, msi_keymap)
         f.close()
     except IOError as e:
