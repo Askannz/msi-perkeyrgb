@@ -39,7 +39,9 @@ optional arguments:
   -v, --version         Prints version and exits.
   -c FILEPATH, --config FILEPATH
                         Loads the configuration file located at FILEPATH.
-                        Refer to the README for syntax.
+                        Refer to the README for syntax. If set to "-", the
+                        configuration file is read from the standard input
+                        (stdin) instead.
   -d, --disable         Disable RGB lighting.
   --id VENDOR_ID:PRODUCT_ID
                         This argument allows you to specify the vendor/product
@@ -55,8 +57,8 @@ optional arguments:
                         specified, will use GE63 as default.
   --list-models         List available laptop models.
   -s HEXCOLOR, --steady HEXCOLOR
-                        Set all of the keyboard to a steady html color, 
-                        ex. 00ff00 for green
+                        Set all of the keyboard to a steady html color. ex.
+                        00ff00 for green
 ```
 
 Features

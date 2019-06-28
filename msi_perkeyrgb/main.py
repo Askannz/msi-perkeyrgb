@@ -15,7 +15,8 @@ DEFAULT_MODEL = "GE63"  # Default laptop model if nothing specified
 def main():
     parser = argparse.ArgumentParser(description='Tool to control per-key RGB keyboard backlighting on MSI laptops. https://github.com/Askannz/msi-perkeyrgb')
     parser.add_argument('-v', '--version', action='store_true', help='Prints version and exits.')
-    parser.add_argument('-c', '--config', action='store', metavar='FILEPATH', help='Loads the configuration file located at FILEPATH. Refer to the README for syntax.')
+    parser.add_argument('-c', '--config', action='store', metavar='FILEPATH', help='Loads the configuration file located at FILEPATH. Refer to the README for syntax. If set to "-", '
+                                                                                    'the configuration file is read from the standard input (stdin) instead.')
     parser.add_argument('-d', '--disable', action='store_true', help='Disable RGB lighting.')
     parser.add_argument('--id', action='store', metavar='VENDOR_ID:PRODUCT_ID', help='This argument allows you to specify the vendor/product id of your keyboard. You should not have to use this unless opening the keyboard fails with the default value. IDs are in hexadecimal format (example :  1038:1122)')
     parser.add_argument('--list-presets', action='store_true', help='List available presets for the given laptop model.')
