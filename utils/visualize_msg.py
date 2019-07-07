@@ -43,7 +43,10 @@ for k in range(NB_KEYS):
     s2 = ' '.join(middle_hexcodes)
     s3 = ' '.join(key_hexcodes)
 
-    print(bcolors.RED + s1 + ' ' + bcolors.ENDC + s2 + ' ' + bcolors.GREEN + s3 + bcolors.ENDC)
+    print(bcolors.RED + s1 + ' ' +
+          bcolors.ENDC + s2 + ' ' +
+          bcolors.GREEN + s3 +
+          bcolors.ENDC)
 
     index += KEY_SETUP_LEN
 

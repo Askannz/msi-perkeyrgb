@@ -85,14 +85,17 @@ def parse_config(f, msi_keymap):
         parameters = list(filter(None, line.split(' ')))
 
         if i == 0 and parameters[0] == "model":
-            warnings += ["Passing the laptop model in the configuration file is deprecated, use the --model option instead."]
+            warnings += ["Passing the laptop model in the configuration file" +
+                         " is deprecated, use the --model option instead."]
             continue
 
         # Parsing a keys/color line
         if len(parameters) == 0:
             continue
         elif len(parameters) > 3:
-            raise ConfigParseError("line %d : Invalid number of parameters (expected 3, got %d)" % (i+1, len(parameters)))
+            raise ConfigParseError("line %d : Invalid number of parameters" +
+                                   " (expected 3, got %d)"
+                                   % (i+1, len(parameters)))
         else:
 
             try:
@@ -131,17 +134,23 @@ def parse_keycodes(msi_keymap, keys_parameter):
         elif re.fullmatch("^[0-9]+-[0-9]+$", key_str):  # Keycode range
             keycode_1, keycode_2 = [int(s) for s in key_str.split('-')]
             if keycode_2 <= keycode_1 or keycode_1 not in msi_keymap.keys() or keycode_2 not in msi_keymap.keys():
-                raise LineParseError("%s is not a valid keycode range." % key_str)
+                raise LineParseError(
+                                    "%s is not a valid keycode range."
+                                    % key_str)
             else:
-                new_keycodes = [k for k in range(keycode_1, keycode_2+1) if k in msi_keymap.keys()]
+                new_keycodes = [k for k in range(keycode_1, keycode_2+1) if
+                                k in msi_keymap.keys()]
                 keycodes += new_keycodes
         else:
-            raise LineParseError("%s is not a keycode, nor a keycode range, nor an alias." % key_str)
+            raise LineParseError(
+                                "%s is not a keycode, nor a keycode range," +
+                                " nor an alias." % key_str)
 
     return keycodes
 
 
-# This is a stub because there is only one mode for now. Will be modified in future versions.
+# This is a stub because there is only one mode for now.
+# Will be modified in future versions.
 def parse_mode(mode_parameter):
 
     if mode_parameter != "steady":
@@ -150,7 +159,7 @@ def parse_mode(mode_parameter):
 
 def parse_color(color_parameter):
 
-    if re.fullmatch("^[0-9a-f]{6}$", color_parameter):  # Color in HTML notation
+    if re.fullmatch("^[0-9a-f]{6}$", color_parameter):  # Color in HTML codes
         color = [int(color_parameter[i:i+2], 16) for i in [0, 2, 4]]
         return color
     else:

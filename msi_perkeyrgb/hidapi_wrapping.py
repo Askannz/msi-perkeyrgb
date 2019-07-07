@@ -37,7 +37,8 @@ class HID_Keyboard:
         lib_path = path_matches[0]
 
         if not exists(lib_path):
-            raise HIDLibraryError("ldconfig reports HIDAPI library at %s but file does not exists." % lib_path)
+            raise HIDLibraryError("ldconfig reports HIDAPI library at %s" +
+                                  " but file does not exists." % lib_path)
 
         # Loading HIDAPI library
         self._hidapi = ct.cdll.LoadLibrary(lib_path)
@@ -62,7 +63,8 @@ class HID_Keyboard:
         sleep(DELAY)  # The RGB controller derps if commands are sent too fast.
 
         if ret == -1 or ret != len(data):
-            raise HIDSendError("HIDAPI returned error upon sending feature report to keyboard.")
+            raise HIDSendError("HIDAPI returned error upon sending feature" +
+                               " report to keyboard.")
 
     def send_output_report(self, data):
 
@@ -70,4 +72,5 @@ class HID_Keyboard:
         sleep(DELAY)
 
         if ret == -1 or ret != len(data):
-            raise HIDSendError("HIDAPI returned error upon sending output report to keyboard.")
+            raise HIDSendError("HIDAPI returned error upon sending outputi" +
+                               " report to keyboard.")
