@@ -77,6 +77,7 @@ This tool should probably work on any recent MSI laptop with a per-key RGB keybo
 | ----  |
 | GE63  |
 | GE73  |
+| GE75  |
 | GS63  |
 | GT63  |
 | GS65  |
