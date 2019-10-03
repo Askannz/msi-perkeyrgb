@@ -1,0 +1,140 @@
+MSI-Steelseries RGB Keyboard Effects Protocol v0.1
+---------------------------------------------
+
+Documented by TauAkiou (www.github.com/TauAkiou)
+
+THIS DOCUMENTATION COMES WITH NO SUPPORT OR LIABILITY. YOU USE THE CONTENTS OF THIS DOCUMENTATION AT YOUR OWN RISK. I CANNOT BE HELD RESPONSIBLE
+IF ANYTHING HAPPENS TO YOU, YOUR COMPUTER, HOUSE, OR ANYTHING. 
+
+-----------------------------------------------
+The Steelseries Effect Protocol [Packet 0x0b]
+-----------------------------------------------
+
+The Effect protocol for the Steelseries RGB protocol is the "0x0b" packet. This packet defines a single "effect"
+that can be assigned to any number of keys. All of the default effects provided by the Steelseries engine can be
+sent to the keyboard through this packet and are in fact derived from it.
+
+Only one effect is sent per packet. Each effect assigned to the keyboard will require it's own 0x0b packet.
+
+  Header	(0x00 - 0x01)
+-----------	
+[0x0b 0x00]
+
+The header does not take or have any arguments attached to it.
+
+Transition Block (0x02 - 0x82)
+-------------------------------
+All transition blocks are 8 bytes in length. The transition table has room for 16 transitions.
+
+
+[<Effect Id>] [0x00] [<RGB Deltas>] [0x00] [Transition Duration] ([Transition #]  [0x00] [<RGB Deltas>] [0x00] [Transition Duration]) ...
+  <1 byte>             <3 bytes>		  <2 bytes, Little Endian>   <1 byte>
+  
+	<Effect Id>
+		- Numerical ID for the effect. This number represents the effect a key will use when assigned to a key in the "0xe0" packet.
+		
+		The effect ID will always represent the first transition in an effect.
+		
+	<RGB Deltas>
+		- Represents how many 'stages' (out of 16) that the controller will brighten or dim the LED over the transition period.
+		
+		[ <Red> <Green> <Blue> ]
+		
+		Each value is a twos-complement signed byte that I have seen range from 0xF1 (-15) to 0x11 (17).
+		
+		The Steelseries Engine only registers a change divisible by 16.
+
+			Example: 
+			From:				->				To:
+			Red: 128							Red: 132
+			Green: 128							Green: 32
+			Blue: 128							Blue: 164
+			
+			will provide deltas of: 
+			
+			Red: 0x00 (0)
+			Blue: 0xFA (-6)
+			Blue: 0x02 (2)
+			
+			The brightness settings for this stage should roughly be:
+			Red: 8 -> 8
+			Green 8 -> 2
+			Blue 8 -> 10
+			
+	<Transition Duration>
+		Determines how long this stage will take (in miliseconds) to transition to its new color.
+		
+		This value must be written in Little Endian.
+		
+			Example: 0xff = 255ms.
+			
+		All durations should add up to the total provided towards the end of the packet.
+		
+	<Transition #>
+	
+	All subsequent transitions will be marked in number order (0x01, 0x02, 0x03, etc) except for the first (the first transition will always be the effect slot number).
+	
+	The fields repeat from the beginning up to the maximum of 16 possible transitions.
+	
+Filler (0x82 - 0x84)
+------
+
+[0x00 0x00]
+
+Starting Color (0x85 - 0x0a)
+----------------------------
+
+[<Red (2 Bytes) <Green (2 bytes> <Blue (2 bytes)>]
+
+These values are stored unusually.
+
+The first RGB hex value is stored in the second byte, and the second RGB hex is stored in the first byte.
+
+Example: 0x52 is stored as:
+			[0x20 0x05]
+			
+Seperator & Filler (0x8b - 0x8f)
+--------------------------------
+
+[0xff 0x00 0x00 0x00 0x00 0x00]
+
+Undocumented Field (0x90 - 0x98)
+--------------------------------
+Appears to control some extra functionality, including Wave Mode. Will document later.
+
+Total Effect Length (0x99 - 0x9a)
+---------------------------------
+
+The total combined length of all effects in the effect block, in miliseconds. Stored in Little Endian.
+
+Extra Space (0x9b - 0x20C)
+--------------------------
+
+Should be all 0x00.
+
+_____________________________________________________________________________________________________________________
+
+Additions to the 0x0e Packet:
+
+Header
+------
+
+[0x0e [region] 0x00 0x00]
+
+Key Fragment
+------------
+
+[<Red> <Green> <Blue>] 0x00 0x00 0x00 0x00 0x00 <Effect ID> <Mode> 0x00 <keycode>
+
+<Red, Green, Blue>
+	- Represents a color. Used when defining static key colors. Will only take effect when Mode is 1(?)
+	
+<Effect ID>
+	- Links the key to an effect. The effect will take hold when the refresh packet is sent.
+	
+<Mode>
+	- Sets the key mode.
+		* 0 - Effect, No Refresh: Uses the supplied Effect ID declared in the key fragment.
+		* 1 - Inline (Static): Use statically defined values obtained from the key fragment itself. (Ignores Effects?)
+		* 2 - Effect, Refresh: Uses the supplied Effect ID and automatically updates the key lighting when the effect changes. This is used by the Steelseries Engine for effects such as Cooldown Timer.
+
