@@ -150,7 +150,7 @@ def parse_mode(mode_parameter):
 
 def parse_color(color_parameter):
 
-    if re.fullmatch("^[0-9a-f]{6}$", color_parameter):  # Color in HTML notation
+    if re.fullmatch("^[0-9a-f]{6}$", color_parameter.lower()):  # Color in HTML notation
         color = [int(color_parameter[i:i+2], 16) for i in [0, 2, 4]]
         return color
     else:
