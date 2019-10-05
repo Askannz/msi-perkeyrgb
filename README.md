@@ -3,6 +3,8 @@ msi-perkeyrgb
 
 This progam allows to control the SteelSeries per-key RGB keyboard backlighting on MSI laptops such as the GE63VR. It *will not work* on models with region-based backlighting (such as GE62VR and others). For those you should use tools like [MSIKLM](https://github.com/Gibtnix/MSIKLM).
 
+This fork is a test version that has been partially rewritten to support the Effects protocol. 
+
 This is an unofficial tool, I am not affiliated to MSI nor SteelSeries in any way.
 
 
@@ -29,7 +31,7 @@ Command-line options
 ```
 usage: msi-perkeyrgb [-h] [-v] [-c FILEPATH] [-d] [--id VENDOR_ID:PRODUCT_ID]
                      [--list-presets] [-p PRESET] [-m MODEL] [--list-models]
-                     [-s HEXCOLOR]
+                     [-s HEXCOLOR] [-V FILEPATH]
 
 Tool to control per-key RGB keyboard backlighting on MSI laptops.
 https://github.com/Askannz/msi-perkeyrgb
@@ -39,6 +41,11 @@ optional arguments:
   -v, --version         Prints version and exits.
   -c FILEPATH, --config FILEPATH
                         Loads the configuration file located at FILEPATH.
+                        Refer to the README for syntax. If set to "-", the
+                        configuration file is read from the standard input
+                        (stdin) instead.
+  -V FILEPATH, --verify FILEPATH
+                        Verifies the configuration file located at FILEPATH.
                         Refer to the README for syntax. If set to "-", the
                         configuration file is read from the standard input
                         (stdin) instead.
@@ -63,7 +70,10 @@ optional arguments:
 
 Features
 ----------
-For per-key configuration, only "Steady" mode (fixed color for each key) is available for now, as I have not figured out the rest of the USB protocol yet. I will add more features later if enough people are interested.
+
+Keyboard wide setup supports only "Steady" mode (fixed color for each key) at this time. 
+
+Per-key configuration supports custom effect transitions in the configuration file only.
 
 Presets are available for supported models, which emulate vendor-provided SteelSeries configurations.
 
@@ -121,8 +131,10 @@ msi-perkeyrgb --model <MSI model> -p <preset>
 msi-perkeyrgb --model <MSI model> -c <path to your configuration file>
 ```
 
-The configuration file can take any extension, but each line must have the following syntax :
+The configuration file can take any extension. There are two types of entries:
 
+
+**Key Entries**
 ```
 <keycodes> <mode> <mode options>
 ```
@@ -140,14 +152,35 @@ The configuration file can take any extension, but each line must have the follo
 	* The Function key (Fn) does not have a keycode, so it is identified by the special alias `fn`.
 	* You can mix keycodes, keycode ranges and aliases. Example : `45,arrows,79-82,fn,18`
 
-* `<mode>` : RGB mode for the selected keys. For now only the `steady` mode (fixed color) is available.
+* `<mode>` : RGB mode for the selected keys:
+    * Available Modes:
+        * `steady <color>`: Fixed color mode.
+        * `effect <name>`: User-defined effect. See 'effect blocks' below for instructions on how to define a new effect.
 
-* `<mode options>` : for `steady` mode, the desired color in HTML notation. Example : `00ff00` (green)
+* `<mode options>` : for `steady` mode, the desired color in HTML notation. Example : `00ff00` (green). For `effect` mode, the name of the assigned effect. Example: `effect1`
 
 
 If the same key is configured differently by multiple lines, the lowest line takes priority.
 
-Lines prefixed with `#` are ignored.
+**Effect Blocks**
+
+```
+effect <effectname>
+    start <startcolor>
+    trans <color> <duration>
+    ...
+end
+```
+
+* `<effectname>` : A short identifying name for an effect. This name is used to associate effects with keys.
+* `start <startcolor>` : Indicates what the starting color of the effect will be, before any transitions take place.
+* `trans <color> <duration>` : Defines a transition.
+    * A transition is a shift between two color states. Transitions are loaded in the order they are defined. 
+    * Up to 16 transitions can be registered to a single effect.
+    
+Lines prefixed with `#` and blank lines are ignored.
+
+
 
 #### Examples
 
@@ -162,6 +195,23 @@ Only WASD keys (for US layout) lit up in red.
 ```
 25,38,39,40 steady ff0000
 ```
+
+Defines an effect called `shift1` that transitions from red, to green, to blue over approximately 15 seconds. The final transition is given an extra 1.5 seconds to make the transition from blue to red smoother.
+```
+effect shift1
+	start ff0000
+	trans 00ff00 500
+	trans 0000ff 500
+	trans ff0000 750
+end
+```
+An iteration of the first effect, only the arrow and function keys use the `shift1` effect.
+```
+all steady ffffff
+arrows steady shift1
+fn steady shift1
+```
+
 
 How does it work ?
 ----------
