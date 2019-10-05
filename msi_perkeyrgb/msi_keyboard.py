@@ -2,7 +2,7 @@ import os
 import random
 import json
 from msi_perkeyrgb.hidapi_wrapping import HID_Keyboard
-from msi_perkeyrgb.protocol import make_key_colors_packet, make_refresh_packet
+from msi_perkeyrgb.msiprotocol import make_key_colors_packet, make_refresh_packet, make_effect_packet
 
 AVAILABLE_MSI_KEYMAPS = [
              (["GE63", "GE73", "GE75", "GS63", "GS73", "GS75", "GX63", "GT63", "GL63"],
@@ -75,13 +75,13 @@ class MSI_Keyboard:
             key_colors_packet = make_key_colors_packet(region, colors_map)
             self._hid_keyboard.send_feature_report(key_colors_packet)
 
-    def set_colors(self, linux_colors_map):
+    def set_colors(self, linux_colors_map, effect_map):
 
         # Translating from Linux keycodes to MSI's own encoding
         linux_keycodes = linux_colors_map.keys()
-        colors = linux_colors_map.values()
+        keyblocks = linux_colors_map.values()
         msi_keycodes = [self._msi_keymap[k] for k in linux_keycodes]
-        msi_colors_map = dict(zip(msi_keycodes, colors))
+        msi_colors_map = dict(zip(msi_keycodes, keyblocks))
 
         # Sorting requested keycodes by keyboard region
         maps_sorted_by_region = {}
@@ -92,9 +92,16 @@ class MSI_Keyboard:
                         maps_sorted_by_region[region] = {}
                     maps_sorted_by_region[region][keycode] = msi_colors_map[keycode]
 
+        # Sending effect commands
+        if effect_map is not None:
+            for effect, effect_objects in effect_map.items():
+                effect_packet = make_effect_packet(effect_objects)
+                self._hid_keyboard.send_feature_report(effect_packet)
+
+
         # Sending color commands by region
         for region, region_colors_map in maps_sorted_by_region.items():
-            key_colors_packet = make_key_colors_packet(region, region_colors_map)
+            key_colors_packet = make_key_colors_packet(region, region_colors_map, effect_map)
             self._hid_keyboard.send_feature_report(key_colors_packet)
 
     def set_preset(self, preset):

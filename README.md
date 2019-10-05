@@ -177,6 +177,11 @@ end
 * `trans <color> <duration>` : Defines a transition.
     * A transition is a shift between two color states. Transitions are loaded in the order they are defined. 
     * Up to 16 transitions can be registered to a single effect.
+    * Transitions operate in a 'loop' - they will repeat in the defined order indefinitely.
+    * The combined duration of all transitions in the loop cannot be greater then 65535 milliseconds. The MSI Control Center
+    only supports up to a 30 second duration, so that is a good rule of thumb to go by.
+        * `color` : The desired color in HTML notation. Example : 00ff00
+        * `duration` : The duration of this transition, in milliseconds. 
     
 Lines prefixed with `#` and blank lines are ignored.
 
