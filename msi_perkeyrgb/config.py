@@ -1,6 +1,7 @@
 import re
 import sys
 
+PRESET_COLORS = {"off": [0x00, 0x00, 0x00]}
 ALIAS_ALL = "all"
 ALIASES = {ALIAS_ALL: "9-133,fn",
            "f_row": "67-76,95,96",
@@ -91,6 +92,32 @@ def load_steady(color, msi_keymap):
         colors_map = update_colors_map(colors_map, keycodes, "steady", color, '')
 
     return colors_map, warnings
+
+
+def load_breathe(color, msi_keymap):
+    """Set up the keymap to use a breathing animation.
+    """
+    colors_map = {}
+    effect_map = {}
+    warnings = []
+
+    try:
+        keycodes = parse_keycodes(msi_keymap, ALIAS_ALL)
+        color = parse_color(color)
+    except LineParseError as e:
+        raise ConfigParseError("Color parse error %s" % str(e)) from e
+        pass
+    else:
+        colors_map = update_colors_map(colors_map, keycodes, "effect", PRESET_COLORS["off"], "breathe_effect")
+
+        # Set up the effect
+        effect_map["breathe_effect"] = MsiEffect(0)
+        effect_map["breathe_effect"].start_color = color
+        effect_map["breathe_effect"].transition_list.append(Transition(PRESET_COLORS["off"], 500))
+        effect_map["breathe_effect"].transition_list.append(Transition(color, 750))
+
+        return colors_map, effect_map, warnings
+
 
 
 def parse_config(f, msi_keymap):

@@ -1,7 +1,7 @@
 import os
 import random
 import json
-from msi_perkeyrgb.config import KeyBlock
+from msi_perkeyrgb.config import KeyBlock, Transition, MsiEffect
 from msi_perkeyrgb.hidapi_wrapping import HID_Keyboard
 from msi_perkeyrgb.msiprotocol import make_key_colors_packet, make_refresh_packet, make_effect_packet
 
@@ -59,7 +59,7 @@ class MSI_Keyboard:
             key_colors_packet = make_key_colors_packet(region, colors_map, None)
             self._hid_keyboard.send_feature_report(key_colors_packet)
 
-    def set_random_color_all(self):
+    def set_random_color_all(self, color):
 
         for region in REGION_KEYCODES.keys():
 
@@ -74,6 +74,19 @@ class MSI_Keyboard:
             colors_map = dict(zip(keycodes, colors_values))
 
             key_colors_packet = make_key_colors_packet(region, colors_map, None)
+            self._hid_keyboard.send_feature_report(key_colors_packet)
+
+    def set_effect_all(self, effect_map, effect_name):
+        for region in REGION_KEYCODES.keys():
+
+            keycodes = REGION_KEYCODES[region]
+            n = len(keycodes)
+            colors_values = []
+
+            colors_values = [KeyBlock([0x00, 0x00, 0x00], effect_name, 0)] * n
+            colors_map = dict(zip(keycodes, colors_values))
+
+            key_colors_packet = make_key_colors_packet(region, colors_map, effect_map)
             self._hid_keyboard.send_feature_report(key_colors_packet)
 
     def set_colors(self, linux_colors_map, effect_map):
@@ -98,7 +111,6 @@ class MSI_Keyboard:
             for effect, effect_objects in effect_map.items():
                 effect_packet = make_effect_packet(effect_objects)
                 self._hid_keyboard.send_feature_report(effect_packet)
-
 
         # Sending color commands by region
         for region, region_colors_map in maps_sorted_by_region.items():

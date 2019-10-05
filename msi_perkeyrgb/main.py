@@ -2,7 +2,7 @@
 
 import sys
 import argparse
-from msi_perkeyrgb.config import load_config, load_steady, ConfigError
+from msi_perkeyrgb.config import load_config, load_steady, load_breathe, ConfigError
 from msi_perkeyrgb.parsing import parse_model, parse_usb_id, parse_preset, UnknownModelError, UnknownIdError, UnknownPresetError
 from msi_perkeyrgb.msi_keyboard import MSI_Keyboard, AVAILABLE_MSI_KEYMAPS
 from msi_perkeyrgb.hidapi_wrapping import HIDLibraryError, HIDNotFoundError, HIDOpenError
@@ -24,6 +24,7 @@ def main():
     parser.add_argument('-m', '--model', action='store', help='Set laptop model (see --list-models). If not specified, will use %s as default.' % DEFAULT_MODEL)
     parser.add_argument('--list-models', action='store_true', help='List available laptop models.')
     parser.add_argument('-s', '--steady', action='store', metavar='HEXCOLOR', help='Set all of the keyboard to a steady html color. ex. 00ff00 for green')
+    parser.add_argument('-b', '--breathe', action='store', metavar='HEXCOLOR', help='Set all of the keyboard to breathing effect of defined color. ex. 00ff00 for green')
     parser.add_argument('-V', '--verify', action='store', metavar='FILEPATH', help='Verifies the configuration file located at FILEPATH. Refer to the readme for syntax. If set to "-", '
                                                                                     'the configuration file is read from the standard output (stdin) instead.')
 
@@ -144,6 +145,15 @@ def main():
                     print("Error preparing steady color : %s" % str(e))
                     sys.exit(1)
                 kb.set_colors(colors_map, None)
+                kb.refresh()
+
+            elif args.breathe:
+                try:
+                    colors_map, effects_map, warnings = load_breathe(args.breathe, msi_keymap)
+                except ConfigError as e:
+                    print(("Error preparing breathing effect : %s" % str(e)))
+                    sys.exit(1)
+                kb.set_colors(colors_map, effects_map)
                 kb.refresh()
 
             # If user has not requested anything
