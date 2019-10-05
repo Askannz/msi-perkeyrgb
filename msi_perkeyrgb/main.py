@@ -6,7 +6,6 @@ from msi_perkeyrgb.config import load_config, load_steady, ConfigError
 from msi_perkeyrgb.parsing import parse_model, parse_usb_id, parse_preset, UnknownModelError, UnknownIdError, UnknownPresetError
 from msi_perkeyrgb.msi_keyboard import MSI_Keyboard, AVAILABLE_MSI_KEYMAPS
 from msi_perkeyrgb.hidapi_wrapping import HIDLibraryError, HIDNotFoundError, HIDOpenError
-from msi_perkeyrgb.msiprotocol import make_key_colors_packet, make_refresh_packet, make_effect_packet
 
 VERSION = "1.4"
 DEFAULT_ID = "1038:1122"

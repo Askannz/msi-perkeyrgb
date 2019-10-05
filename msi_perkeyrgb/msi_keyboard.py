@@ -1,6 +1,7 @@
 import os
 import random
 import json
+from msi_perkeyrgb.config import KeyBlock
 from msi_perkeyrgb.hidapi_wrapping import HID_Keyboard
 from msi_perkeyrgb.msiprotocol import make_key_colors_packet, make_refresh_packet, make_effect_packet
 
@@ -52,10 +53,10 @@ class MSI_Keyboard:
 
             keycodes = REGION_KEYCODES[region]
             n = len(keycodes)
-            colors_values = [color] * n
+            colors_values = [KeyBlock(color, "", 1) ] * n
             colors_map = dict(zip(keycodes, colors_values))
 
-            key_colors_packet = make_key_colors_packet(region, colors_map)
+            key_colors_packet = make_key_colors_packet(region, colors_map, None)
             self._hid_keyboard.send_feature_report(key_colors_packet)
 
     def set_random_color_all(self):
@@ -69,10 +70,10 @@ class MSI_Keyboard:
                 r = random.randint(0, 255)
                 g = random.randint(0, 255)
                 b = random.randint(0, 255)
-                colors_values.append([r, g, b])
+                colors_values.append(KeyBlock([r, g, b], "", 1))
             colors_map = dict(zip(keycodes, colors_values))
 
-            key_colors_packet = make_key_colors_packet(region, colors_map)
+            key_colors_packet = make_key_colors_packet(region, colors_map, None)
             self._hid_keyboard.send_feature_report(key_colors_packet)
 
     def set_colors(self, linux_colors_map, effect_map):

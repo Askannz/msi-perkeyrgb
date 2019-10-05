@@ -27,10 +27,10 @@ class Transition:
 
 
 class KeyBlock:
-    def __init__(self):
-        self.mode = -1
-        self.effect_name = ""
-        self.color = [0x00, 0x00, 0x00]
+    def __init__(self, color=(0x00, 0x00, 0x00), effect="", mode=-1):
+        self.mode = mode
+        self.effect_name = effect
+        self.color = color
 
 
 class ConfigError(Exception):
