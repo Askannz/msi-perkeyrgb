@@ -16,7 +16,7 @@ If you are on Archlinux, use this AUR package : [msi-perkeyrgb](https://aur.arch
 For Ubuntu or others :
 
 ```
-git clone https://github.com/Askannz/msi-perkeyrgb
+git clone https://github.com/TauAkiou/msi-perkeyrgb
 cd msi-perkeyrgb/
 sudo python3 setup.py install
 sudo cp 99-msi-rgb.rules /etc/udev/rules.d/
