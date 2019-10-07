@@ -18,6 +18,12 @@ class MsiEffect:
         self.transition_list = []
         self.period = 0
         self.identifier = ident
+        self.wave_mode = False
+        self.wave_origin_x = None
+        self.wave_origin_y = None
+        self.wave_rad_control = None
+        self.wave_wavelength = None
+        self.wave_direction = None
 
 
 class Transition:
@@ -28,10 +34,12 @@ class Transition:
 
 
 class KeyBlock:
-    def __init__(self, color=(0x00, 0x00, 0x00), effect="", mode=-1):
+    def __init__(self, color=PRESET_COLORS["off"], effect="", mode=-1):
         self.mode = mode
         self.effect_name = effect
         self.color = color
+        self.react_color = PRESET_COLORS["off"]
+        self.react_duration = 0
 
 
 class ConfigError(Exception):
@@ -169,6 +177,43 @@ def parse_config(f, msi_keymap):
                 else:
                     effect_map[selected_event_name].start_color = startcolor
                     continue
+            elif parameters[0] == "wave":
+                if len(parameters) != 6:
+                    raise ConfigParseError("line %d: Effect wave statement invalid (requires 6 parameters)")
+                try:
+                    effect_map[selected_event_name].wave_mode = True
+
+                    origin_x = verify_percentage(int(parameters[1]))
+                    effect_map[selected_event_name].wave_origin_x = origin_x
+
+                    origin_y = verify_percentage(int(parameters[2]))
+                    effect_map[selected_event_name].wave_origin_y = origin_y
+
+                    rad_control = parameters[3].lower()
+                    if rad_control == "xy":
+                        effect_map[selected_event_name].wave_rad_control = "xy"
+                    elif rad_control == "y":
+                        effect_map[selected_event_name].wave_rad_control = "y"
+                    elif rad_control == "x":
+                        effect_map[selected_event_name].wave_rad_control = "x"
+                    else:
+                        raise ConfigParseError("line %d: Parameter 'wave_direction' is not valid. (expected: \"x\", \"y\", \"xy\", got %s" % i+1, parameters[3].lower)
+
+                    wavelength = verify_percentage(int(parameters[4]))
+                    effect_map[selected_event_name].wave_wavelength = wavelength
+
+                    direction = parameters[5].lower()
+                    if direction == "in":
+                        effect_map[selected_event_name].wave_direction = direction
+                    elif direction == "out":
+                        effect_map[selected_event_name].wave_direction = direction
+                    else:
+                        raise ConfigParseError("line %d: parameter \"wave_direction\" is not valid."
+                                               " (expected: \"in\", \"out\", got %s)" % i+1, direction)
+                except LineParseError as e:
+                    raise ConfigParseError("line %d: %s" % (i + 1, str(e))) from e
+                continue
+
             elif parameters[0] == "end":
                 in_event_block = 0
                 selected_event_name = ""
@@ -183,6 +228,7 @@ def parse_config(f, msi_keymap):
         if parameters[0] == "effect":
             if len(parameters) != 2:
                 raise ConfigParseError("line %d: Effect declaration invalid. (expected 2 parameters, got %d)" % (i+1, len(parameters)))
+                pass
             selected_event_name = parameters[1]
             effect_map[selected_event_name] = MsiEffect(len(effect_map))
             in_event_block = 1
@@ -195,25 +241,45 @@ def parse_config(f, msi_keymap):
         # Parsing a keys/color line
         if len(parameters) == 0:
             continue
-        elif len(parameters) > 3:
-            raise ConfigParseError("line %d : Invalid number of parameters (expected 3, got %d)" % (i+1, len(parameters)))
+        elif len(parameters) > 3 | len(parameters):
+            raise ConfigParseError("line %d : Invalid number of parameters (expected 3 or 4) got %d)" %
+                                   (i+1, len(parameters)))
+            pass
         else:
 
             try:
-                effectname = ""
-                color = "000000"
+                effectname = None
+                color_react = None
+                color_react_duration = None
+                color = None
 
                 keycodes = parse_keycodes(msi_keymap, parameters[0])
                 parsemode = parse_mode(parameters[1])
                 if parsemode == "effect":
-                    effectname = parameters[2]
+                    if len(parameters) == 3:
+                        effectname = parameters[2]
+                    else:
+                        raise ConfigParseError("line %d : Invalid number of parameters (expected 3 or 5) got %d)" %
+                            (i + 1, len(parameters)))
+
                 elif parsemode == "steady":
+                    if len(parameters) != 3:
+                        raise ConfigParseError("line %d : Invalid number of parameters (expected 3) got %d)" %
+                                               (i + 1, len(parameters)))
                     color = parse_color(parameters[2])
+                elif parsemode == "reactive":
+                    if len(parameters) != 5:
+                        raise ConfigParseError("line %d : Invalid number of parameters for parameter 'reactive (expected 4) got %d)" %
+                                               (i + 1, len(parameters)))
+                    color = parse_color(parameters[2])
+                    color_react = parse_color(parameters[3])
+                    color_react_duration = int(parameters[4])
             except LineParseError as e:
                 raise ConfigParseError("line %d : %s" % (i+1, str(e))) from e
                 pass
             else:
-                colors_map = update_colors_map(colors_map, keycodes, parsemode, color, effectname)
+                colors_map = update_colors_map(colors_map, keycodes, parsemode, color, effectname, color_react,
+                                               color_react_duration)
 
     if in_event_block == 1:
         raise ConfigParseError("<EOF>: An effect block was not closed properly.")
@@ -261,6 +327,8 @@ def parse_mode(mode_parameter):
         return "steady"
     elif mode_parameter == "effect":
         return "effect"
+    elif mode_parameter == "reactive":
+        return "reactive"
     else:
         raise LineParseError("Unknown mode %s" % mode_parameter)
 
@@ -283,7 +351,7 @@ def parse_time_period(duration_parameter, current_period):
     return new_period
 
 
-def update_colors_map(colors_map, keycodes, keymode, color, effect_name):
+def update_colors_map(colors_map, keycodes, keymode, color=None, effect_name=None, react_color=None, react_duration=None):
 
     # Modes:
     #       0: Effect, Manual Refresh
@@ -298,6 +366,11 @@ def update_colors_map(colors_map, keycodes, keymode, color, effect_name):
         elif keymode == "steady":
             colors_map[k].mode = 1
             colors_map[k].color = color
+        elif keymode == "reactive":
+            colors_map[k].mode = 8
+            colors_map[k].color = color
+            colors_map[k].react_color = react_color
+            colors_map[k].react_duration = react_duration
         else:
             raise ConfigParseError("Invalid key mode detected for keycode %s" % k)
 
@@ -325,3 +398,10 @@ def verify_effect(effect_map):
         effect_map[key].period = period
 
     return effect_map
+
+
+def verify_percentage(percent):
+    if percent <= 100 | percent >= 100:
+        return percent / 100
+    else:
+        raise ConfigParseError("Percentage value is invalid. (length: %d ms)" % percent)

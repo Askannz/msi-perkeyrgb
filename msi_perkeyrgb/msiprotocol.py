@@ -16,13 +16,23 @@ def make_key_colors_packet(region, colors_map, effect_map):
     k = 0
     for keycode, blkobj in colors_map.items():
 
+        react_list = [0x00, 0x00]
         if blkobj.mode == 1:
             effect_id = 0
+            blkobj.react_color = [0x00, 0x00, 0x00]
+        elif blkobj.mode == 8:
+            effect_id = 255
         else:
             blkobj.color = [0x00, 0x00, 0x00]
+            blkobj.react_color = [0x00, 0x00, 0x00]
             effect_id = effect_map[blkobj.effect_name].identifier
 
-        key_fragment = blkobj.color + [0x00, 0x00, 0x00, 0x00, 0x00] + [effect_id] + [blkobj.mode] + [0x00] + [keycode]
+        key_fragment = blkobj.color + blkobj.react_color
+
+        key_fragment += blkobj.react_duration.to_bytes(2, 'little')
+
+        key_fragment += [effect_id] + [blkobj.mode] + [0x00] + [keycode]
+
         packet += key_fragment
         k += 1
 
@@ -77,29 +87,45 @@ def make_effect_packet(effect_entry):
 
     packet += get_color_starting_bytes(effect_entry.start_color)
 
-    packet += [0xff, 0x00, 0x00, 0x00, 0x00, 0x00]
+    packet += [0xff, 0x00]
 
-    # this appear to correspond to additional effects, such as wave mode.
-    # TODO: Decipher and implement.
-    packet += [0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
+    if effect_entry.wave_mode:
+        packet += get_range_val_from_percent(effect_entry.wave_origin_x, 0, 0x105C).to_bytes(2, 'little')
+        packet += get_range_val_from_percent(effect_entry.wave_origin_y, 0, 0x040D).to_bytes(2, 'little')
+        if effect_entry.wave_rad_control == "xy":
+            packet += [0x01, 0x00, 0x01, 0x00]
+        elif effect_entry.wave_rad_control == "y":
+            packet += [0x00, 0x00, 0x01, 0x00]
+        elif effect_entry.wave_rad_control == "x":
+            packet += [0x01, 0x00, 0x00, 0x00]
+        else:
+            packet += [0x00, 0x00, 0x00, 0x00]
+
+        packet += get_range_val_from_percent(effect_entry.wave_wavelength, 0x001F, 0x03E9).to_bytes(2, 'little')
+    else:
+        packet += [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
 
     packet += [len(effect_entry.transition_list)]
 
-    packet += [0x00, 0x00, 0x00, 0x00]
-
-    # Final duration
+    packet += [0x00]
+    # Total duration
     packet += period.to_bytes(2, 'little')
 
+    if effect_entry.wave_mode:
+        if effect_entry.wave_direction == "in":
+            packet += [0x00]
+        elif effect_entry.wave_direction == "out":
+            packet += [0x01]
     # Final packet filler bytes
-    packet += [0x00] * 366
+    packet += [0x00] * 365
 
     return packet
 
 
 def calculate_color_delta(start, target):
-    delta_red = math.floor((target[0] - start[0]) / 16)
-    delta_green = math.floor((target[1] - start[1]) / 16)
-    delta_blue = math.floor((target[2] - start[2]) / 16)
+    delta_red = math.floor((target[0] - start[0]) / 15)
+    delta_green = math.floor((target[1] - start[1]) / 15)
+    delta_blue = math.floor((target[2] - start[2]) / 15)
 
     if delta_red < 0:
         delta_red = 256 + delta_red
@@ -124,6 +150,9 @@ def get_color_starting_bytes(color):
 
     return color_bytes
 
+
+def get_range_val_from_percent(percent, min, max):
+    return math.floor(((max - min) * percent) + min)
 
 def make_refresh_packet():
 
