@@ -11,7 +11,7 @@ This is an unofficial tool, I am not affiliated to MSI nor SteelSeries in any wa
 Installation
 ----------
 
-If you are on Archlinux, use this AUR package : [msi-perkeyrgb](https://aur.archlinux.org/packages/msi-perkeyrgb/)
+There is currently no official release for this version. Follow the steps below:
 
 For Ubuntu or others :
 
