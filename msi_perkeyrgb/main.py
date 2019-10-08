@@ -7,7 +7,7 @@ from msi_perkeyrgb.parsing import parse_model, parse_usb_id, parse_preset, Unkno
 from msi_perkeyrgb.msi_keyboard import MSI_Keyboard, AVAILABLE_MSI_KEYMAPS
 from msi_perkeyrgb.hidapi_wrapping import HIDLibraryError, HIDNotFoundError, HIDOpenError
 
-VERSION = "1.4"
+VERSION = "1.4_effects_alpha"
 DEFAULT_ID = "1038:1122"
 DEFAULT_MODEL = "GE63"  # Default laptop model if nothing specified
 

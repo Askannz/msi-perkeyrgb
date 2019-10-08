@@ -127,7 +127,6 @@ def load_breathe(color, msi_keymap):
         return colors_map, effect_map, warnings
 
 
-
 def parse_config(f, msi_keymap):
 
     colors_map = {}
@@ -197,7 +196,7 @@ def parse_config(f, msi_keymap):
                     elif rad_control == "x":
                         effect_map[selected_event_name].wave_rad_control = "x"
                     else:
-                        raise ConfigParseError("line %d: Parameter 'wave_direction' is not valid. (expected: \"x\", \"y\", \"xy\", got %s" % i+1, parameters[3].lower)
+                        raise ConfigParseError("line %d: Parameter 'axis' is not valid. (expected: \"x\", \"y\", \"xy\", got %s" % i+1, parameters[3].lower)
 
                     wavelength = verify_percentage(int(parameters[4]))
                     effect_map[selected_event_name].wave_wavelength = wavelength
@@ -208,7 +207,7 @@ def parse_config(f, msi_keymap):
                     elif direction == "out":
                         effect_map[selected_event_name].wave_direction = direction
                     else:
-                        raise ConfigParseError("line %d: parameter \"wave_direction\" is not valid."
+                        raise ConfigParseError("line %d: parameter \"direction\" is not valid."
                                                " (expected: \"in\", \"out\", got %s)" % i+1, direction)
                 except LineParseError as e:
                     raise ConfigParseError("line %d: %s" % (i + 1, str(e))) from e
@@ -241,7 +240,7 @@ def parse_config(f, msi_keymap):
         # Parsing a keys/color line
         if len(parameters) == 0:
             continue
-        elif len(parameters) > 3 | len(parameters):
+        elif len(parameters) < 3 | len(parameters) > 4:
             raise ConfigParseError("line %d : Invalid number of parameters (expected 3 or 4) got %d)" %
                                    (i+1, len(parameters)))
             pass
@@ -255,6 +254,7 @@ def parse_config(f, msi_keymap):
 
                 keycodes = parse_keycodes(msi_keymap, parameters[0])
                 parsemode = parse_mode(parameters[1])
+
                 if parsemode == "effect":
                     if len(parameters) == 3:
                         effectname = parameters[2]
@@ -269,7 +269,7 @@ def parse_config(f, msi_keymap):
                     color = parse_color(parameters[2])
                 elif parsemode == "reactive":
                     if len(parameters) != 5:
-                        raise ConfigParseError("line %d : Invalid number of parameters for parameter 'reactive (expected 4) got %d)" %
+                        raise ConfigParseError("line %d : Invalid number of parameters for parameter 'reactive (expected 5) got %d)" %
                                                (i + 1, len(parameters)))
                     color = parse_color(parameters[2])
                     color_react = parse_color(parameters[3])
@@ -357,6 +357,7 @@ def update_colors_map(colors_map, keycodes, keymode, color=None, effect_name=Non
     #       0: Effect, Manual Refresh
     #       1: Static
     #       2: Effect, Automatic Refresh
+    #       8: Reactive
 
     for k in keycodes:
         colors_map[k] = KeyBlock()
