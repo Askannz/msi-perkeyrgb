@@ -1,5 +1,5 @@
 import re
-from msi_perkeyrgb.msi_keyboard import AVAILABLE_MSI_KEYMAPS
+from .protocol_data.msi_keymaps import AVAILABLE_MSI_KEYMAPS
 
 
 class UnknownModelError(Exception):

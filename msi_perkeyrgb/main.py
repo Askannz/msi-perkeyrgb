@@ -2,10 +2,11 @@
 
 import sys
 import argparse
-from msi_perkeyrgb.config import load_config, load_steady, load_breathe, ConfigError
-from msi_perkeyrgb.parsing import parse_model, parse_usb_id, parse_preset, UnknownModelError, UnknownIdError, UnknownPresetError
-from msi_perkeyrgb.msi_keyboard import MSI_Keyboard, AVAILABLE_MSI_KEYMAPS
-from msi_perkeyrgb.hidapi_wrapping import HIDLibraryError, HIDNotFoundError, HIDOpenError
+from .config import load_config, load_steady, load_breathe, ConfigError
+from .parsing import parse_model, parse_usb_id, parse_preset, UnknownModelError, UnknownIdError, UnknownPresetError
+from .msi_keyboard import MSI_Keyboard
+from .protocol_data.msi_keymaps import AVAILABLE_MSI_KEYMAPS
+from .hidapi_wrapping import HIDLibraryError, HIDNotFoundError, HIDOpenError
 
 VERSION = "1.4_effects_alpha"
 DEFAULT_ID = "1038:1122"
