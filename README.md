@@ -3,20 +3,18 @@ msi-perkeyrgb
 
 This progam allows to control the SteelSeries per-key RGB keyboard backlighting on MSI laptops such as the GE63VR. It *will not work* on models with region-based backlighting (such as GE62VR and others). For those you should use tools like [MSIKLM](https://github.com/Gibtnix/MSIKLM).
 
-This fork is a test version that has been partially rewritten to support the Effects protocol. 
-
 This is an unofficial tool, I am not affiliated to MSI nor SteelSeries in any way.
 
 
 Installation
 ----------
 
-There is currently no official release for this version. Follow the steps below:
+If you are on Archlinux, use this AUR package : [msi-perkeyrgb](https://aur.archlinux.org/packages/msi-perkeyrgb/) (not up-to-date with the Git version yet)
 
 For Ubuntu or others :
 
 ```
-git clone https://github.com/TauAkiou/msi-perkeyrgb
+git clone https://github.com/Askannz/msi-perkeyrgb
 cd msi-perkeyrgb/
 sudo python3 setup.py install
 sudo cp 99-msi-rgb.rules /etc/udev/rules.d/
@@ -105,6 +103,7 @@ The newly added 'effect' support has been successfully tested with the following
 | Model |
 | ----- |
 | GS65  |
+| GE63  |
 
 Please let me know if it works for your particular model, so that I can update this list.
 
@@ -270,14 +269,10 @@ all effect threewave
 How does it work ?
 ----------
 
-[Original Author]
-
 The SteelSeries keyboard is connected to the MSI laptop by two independent interfaces :
 * A PS/2 interface to send keypresses
 * a USB HID-compliant interface to receive RGB commands
 
-On my laptop (GE63VR), the USB interface has the vendor/product ID 0x1038:0x1122. It should be the same for other models, but if it is not, you can specify it yourself with the `--id` option (see above).
-
-I used Wireshark to capture the USB traffic between the SteelSeries Engine on Windows and the keyboard. Then it was a matter of figuring out the protocol used. Due to a lack of time, I have only been able to reverse-engineer the "Steady" mode for each key. Feel free to improve on this work, I will review pull requests.
+Talking to the RGB controller from Linux is a matter of sending the correct binary packets on the USB HID interface. I used Wireshark to capture the traffic between the SteelSeries Engine on Windows and the keyboard, and then analyzed the captured data to figure out the protocol used. I was only able to reverse-engineer the simple "steady color" commands, but that work was massively improved upon by https://github.com/TauAkiou, who figured out the rest of the protocol and implemented the remainging effects. His work include a detailed write-up of the protocol which you can read [here](https://github.com/Askannz/msi-perkeyrgb/blob/master/0b_packet_information/msi-kb-effectdoc).
 
 The HID communication code was inspired by other tools designed for previous generations of MSI laptops, such as [MSIKLM](https://github.com/Gibtnix/MSIKLM).
