@@ -45,7 +45,7 @@ class MSI_Keyboard:
 
             keycodes = REGION_KEYCODES[region]
             n = len(keycodes)
-            colors_values = [KeyBlock(color, "", 1) ] * n
+            colors_values = [KeyBlock(color, "", 1)] * n
             colors_map = dict(zip(keycodes, colors_values))
 
             key_colors_packet = make_key_colors_packet(region, colors_map, None)
@@ -58,7 +58,7 @@ class MSI_Keyboard:
             keycodes = REGION_KEYCODES[region]
             n = len(keycodes)
             colors_values = []
-            for i in range(n):
+            for _ in range(n):
                 r = random.randint(0, 255)
                 g = random.randint(0, 255)
                 b = random.randint(0, 255)
@@ -101,7 +101,7 @@ class MSI_Keyboard:
 
         # Sending effect commands
         if effect_map is not None:
-            for effect, effect_objects in effect_map.items():
+            for _, effect_objects in effect_map.items():
                 effect_packet = make_effect_packet(effect_objects)
                 self._hid_keyboard.send_feature_report(effect_packet)
 

@@ -133,7 +133,7 @@ def main():
                     sys.exit(1)
 
                 for w in warnings:
-                        print("Warning :", w)
+                    print("Warning :", w)
 
                 kb.set_colors(colors_map, effects_map)
                 kb.refresh()

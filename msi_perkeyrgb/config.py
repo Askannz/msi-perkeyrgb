@@ -66,20 +66,16 @@ def load_config(config_path, msi_keymap):
             f = open(config_path, "r")
         config_map, effect_map, warnings = parse_config(f, msi_keymap)
         f.close()
-    except IOError as e:
-        raise ConfigError("IOError : %s" % str(e)) from e
-        pass
     except FileNotFoundError as e:
         raise ConfigError("File %s does not exist" % config_path) from e
-        pass
+    except IOError as e:
+        raise ConfigError("IOError : %s" % str(e)) from e
     except ConfigParseError as e:
         raise ConfigError("Parsing error : %s" % str(e)) from e
-        pass
     except UnknownModelError as e:
         raise e
     except Exception as e:
         raise ConfigError("Unknown error : %s" % str(e)) from e
-        pass
     else:
         return config_map, effect_map, warnings
 
@@ -95,7 +91,6 @@ def load_steady(color, msi_keymap):
         color = parse_color(color)
     except LineParseError as e:
         raise ConfigParseError("Color parse error %s" % str(e)) from e
-        pass
     else:
         colors_map = update_colors_map(colors_map, keycodes, "steady", color, '')
 
@@ -114,7 +109,6 @@ def load_breathe(color, msi_keymap):
         color = parse_color(color)
     except LineParseError as e:
         raise ConfigParseError("Color parse error %s" % str(e)) from e
-        pass
     else:
         colors_map = update_colors_map(colors_map, keycodes, "effect", PRESET_COLORS["off"], "breathe_effect")
 
@@ -162,7 +156,6 @@ def parse_config(f, msi_keymap):
                     effect_map[selected_event_name].period = parse_time_period(transition_duration, effect_map[selected_event_name].period)
                 except LineParseError as e:
                     raise ConfigParseError("line %d : %s" % (i + 1, str(e))) from e
-                    pass
                 else:
                     effect_add_transition(effect_map, selected_event_name, transition_color, transition_duration)
                     continue
@@ -227,7 +220,6 @@ def parse_config(f, msi_keymap):
         if parameters[0] == "effect":
             if len(parameters) != 2:
                 raise ConfigParseError("line %d: Effect declaration invalid. (expected 2 parameters, got %d)" % (i+1, len(parameters)))
-                pass
             selected_event_name = parameters[1]
             effect_map[selected_event_name] = MsiEffect(len(effect_map))
             in_event_block = 1
@@ -243,7 +235,6 @@ def parse_config(f, msi_keymap):
         elif len(parameters) < 3 | len(parameters) > 4:
             raise ConfigParseError("line %d : Invalid number of parameters (expected 3 or 4) got %d)" %
                                    (i+1, len(parameters)))
-            pass
         else:
 
             try:
@@ -276,7 +267,6 @@ def parse_config(f, msi_keymap):
                     color_react_duration = int(parameters[4])
             except LineParseError as e:
                 raise ConfigParseError("line %d : %s" % (i+1, str(e))) from e
-                pass
             else:
                 colors_map = update_colors_map(colors_map, keycodes, parsemode, color, effectname, color_react,
                                                color_react_duration)

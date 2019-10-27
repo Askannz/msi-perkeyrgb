@@ -21,8 +21,8 @@ def parse_model(model_arg):
         for model in msi_models:
             if model == model_arg_nocase:
                 return model
-    else:
-        raise UnknownModelError(model_arg)
+
+    raise UnknownModelError(model_arg)
 
 
 def parse_usb_id(id_arg):
