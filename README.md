@@ -91,19 +91,19 @@ The original codebase has been succesfully tested with the following models :
 | GE63  |
 | GE73  |
 | GE75  |
+| GL63  |
 | GS63  |
-| GT63  |
 | GS65  |
 | GS75  |
-| GL63  |
-
+| GT63  |
+| GT75  |
 
 The newly added 'effect' support has been successfully tested with the following models:
 
 | Model |
 | ----- |
-| GS65  |
 | GE63  |
+| GS65  |
 
 Please let me know if it works for your particular model, so that I can update this list.
 
