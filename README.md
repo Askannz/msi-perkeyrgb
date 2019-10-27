@@ -104,13 +104,15 @@ This is by far the most flexible and powerful way to use this tool, since the co
 The configuration file can have any extension. See the [dedicated wiki page](https://github.com/Askannz/msi-perkeyrgb/wiki/Configuration-file-guide) for its syntax and examples.
 
 
-How does it work ?
+How does it work, and credits
 ----------
 
 The SteelSeries keyboard is connected to the MSI laptop by two independent interfaces :
 * A PS/2 interface to send keypresses
 * a USB HID-compliant interface to receive RGB commands
 
-Talking to the RGB controller from Linux is a matter of sending the correct binary packets on the USB HID interface. I used Wireshark to capture the traffic between the SteelSeries Engine on Windows and the keyboard, and then analyzed the captured data to figure out the protocol used. I was only able to reverse-engineer the simple "steady color" commands, but that work was massively improved upon by https://github.com/TauAkiou, who figured out the rest of the protocol and implemented the remaining effects. His work include a detailed write-up of the protocol which you can read [here](documentation/0b_packet_information/msi-kb-effectdoc).
+Talking to the RGB controller from Linux is a matter of sending the correct binary packets on the USB HID interface. I used Wireshark to capture the traffic between the SteelSeries Engine on Windows and the keyboard, and then analyzed the captured data to figure out the protocol used. I was only able to reverse-engineer the simple "steady color" commands, but that work was massively improved upon by [TauAkiou](https://github.com/TauAkiou), who figured out the rest of the protocol and implemented the remaining effects. His work include an amazingly detailed write-up of the protocol which you can read [here](documentation/0b_packet_information/msi-kb-effectdoc).
+
+Also thanks to [tbh1](https://github.com/tbh1) for providing packet dumps of presets effects.
 
 The HID communication code was inspired by other tools designed for previous generations of MSI laptops, such as [MSIKLM](https://github.com/Gibtnix/MSIKLM).
