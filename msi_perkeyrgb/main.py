@@ -2,12 +2,12 @@
 
 import sys
 import argparse
-from msi_perkeyrgb.config import load_config, load_steady, ConfigError
+from msi_perkeyrgb.config import load_config, load_steady, load_breathe, ConfigError
 from msi_perkeyrgb.parsing import parse_model, parse_usb_id, parse_preset, UnknownModelError, UnknownIdError, UnknownPresetError
 from msi_perkeyrgb.msi_keyboard import MSI_Keyboard, AVAILABLE_MSI_KEYMAPS
 from msi_perkeyrgb.hidapi_wrapping import HIDLibraryError, HIDNotFoundError, HIDOpenError
 
-VERSION = "1.4"
+VERSION = "1.4_effects_alpha"
 DEFAULT_ID = "1038:1122"
 DEFAULT_MODEL = "GE63"  # Default laptop model if nothing specified
 
@@ -24,6 +24,9 @@ def main():
     parser.add_argument('-m', '--model', action='store', help='Set laptop model (see --list-models). If not specified, will use %s as default.' % DEFAULT_MODEL)
     parser.add_argument('--list-models', action='store_true', help='List available laptop models.')
     parser.add_argument('-s', '--steady', action='store', metavar='HEXCOLOR', help='Set all of the keyboard to a steady html color. ex. 00ff00 for green')
+    parser.add_argument('-b', '--breathe', action='store', metavar='HEXCOLOR', help='Set all of the keyboard to breathing effect of defined color. ex. 00ff00 for green')
+    parser.add_argument('-V', '--verify', action='store', metavar='FILEPATH', help='Verifies the configuration file located at FILEPATH. Refer to the readme for syntax. If set to "-", '
+                                                                                    'the configuration file is read from the standard output (stdin) instead.')
 
     args = parser.parse_args()
 
@@ -89,7 +92,7 @@ def main():
                     print("No USB device with ID %s found." % args.id)
                 sys.exit(1)
             except HIDOpenError:
-                print("Cannot open keyboard. Possible causes :\n- You don't have permissions to open the HID device. Run this program as root, or give yourself read/write permissions to the corresponding /dev/hidraw*. If you have just installed this tool, reboot your computer for the udev rule to take effect.\n- USB device with id %s is not a HID device." % id_str)
+                print("Cannot open keyboard. Possible causes :\n- You don't have permissions to open the HID device. Run this program as root, or give yourself read/write permissions to the corresponding /dev/hidraw*. If you have just installed this tool, reboot your computer for the udev rule to take effect.\n- USB device with id is not a HID device.")
                 sys.exit(1)
 
             # If user has requested disabling
@@ -108,10 +111,22 @@ def main():
                 kb.set_preset(preset)
                 kb.refresh()
 
+            elif args.verify:
+                try:
+                    colors_map, effects_map, warnings = load_config(args.verify, msi_keymap)
+                except ConfigError as e:
+                    print("Error reading config file : %s" % str(e))
+                    sys.exit(1)
+
+                print("Config file '%s' parsed successfully." % args.verify)
+
+                for w in warnings:
+                    print("Warning :", w)
+
             # If user has requested to load a config file
             elif args.config:
                 try:
-                    colors_map, warnings = load_config(args.config, msi_keymap)
+                    colors_map, effects_map, warnings = load_config(args.config, msi_keymap)
                 except ConfigError as e:
                     print("Error reading config file : %s" % str(e))
                     sys.exit(1)
@@ -119,7 +134,7 @@ def main():
                 for w in warnings:
                         print("Warning :", w)
 
-                kb.set_colors(colors_map)
+                kb.set_colors(colors_map, effects_map)
                 kb.refresh()
 
             # If user has requested to display a steady color
@@ -129,7 +144,16 @@ def main():
                 except ConfigError as e:
                     print("Error preparing steady color : %s" % str(e))
                     sys.exit(1)
-                kb.set_colors(colors_map)
+                kb.set_colors(colors_map, None)
+                kb.refresh()
+
+            elif args.breathe:
+                try:
+                    colors_map, effects_map, warnings = load_breathe(args.breathe, msi_keymap)
+                except ConfigError as e:
+                    print(("Error preparing breathing effect : %s" % str(e)))
+                    sys.exit(1)
+                kb.set_colors(colors_map, effects_map)
                 kb.refresh()
 
             # If user has not requested anything

@@ -3,18 +3,20 @@ msi-perkeyrgb
 
 This progam allows to control the SteelSeries per-key RGB keyboard backlighting on MSI laptops such as the GE63VR. It *will not work* on models with region-based backlighting (such as GE62VR and others). For those you should use tools like [MSIKLM](https://github.com/Gibtnix/MSIKLM).
 
+This fork is a test version that has been partially rewritten to support the Effects protocol. 
+
 This is an unofficial tool, I am not affiliated to MSI nor SteelSeries in any way.
 
 
 Installation
 ----------
 
-If you are on Archlinux, use this AUR package : [msi-perkeyrgb](https://aur.archlinux.org/packages/msi-perkeyrgb/)
+There is currently no official release for this version. Follow the steps below:
 
 For Ubuntu or others :
 
 ```
-git clone https://github.com/Askannz/msi-perkeyrgb
+git clone https://github.com/TauAkiou/msi-perkeyrgb
 cd msi-perkeyrgb/
 sudo python3 setup.py install
 sudo cp 99-msi-rgb.rules /etc/udev/rules.d/
@@ -29,7 +31,7 @@ Command-line options
 ```
 usage: msi-perkeyrgb [-h] [-v] [-c FILEPATH] [-d] [--id VENDOR_ID:PRODUCT_ID]
                      [--list-presets] [-p PRESET] [-m MODEL] [--list-models]
-                     [-s HEXCOLOR]
+                     [-s HEXCOLOR] [-b HEXCOLOR] [-V FILEPATH]
 
 Tool to control per-key RGB keyboard backlighting on MSI laptops.
 https://github.com/Askannz/msi-perkeyrgb
@@ -59,11 +61,22 @@ optional arguments:
   -s HEXCOLOR, --steady HEXCOLOR
                         Set all of the keyboard to a steady html color. ex.
                         00ff00 for green
+  -b HEXCOLOR, --breathe HEXCOLOR
+                        Set all of the keyboard to breathing effect of defined
+                        color. ex. 00ff00 for green
+  -V FILEPATH, --verify FILEPATH
+                        Verifies the configuration file located at FILEPATH.
+                        Refer to the readme for syntax. If set to "-", the
+                        configuration file is read from the standard output
+                        (stdin) instead.
 ```
 
 Features
 ----------
-For per-key configuration, only "Steady" mode (fixed color for each key) is available for now, as I have not figured out the rest of the USB protocol yet. I will add more features later if enough people are interested.
+
+Keyboard wide setup from the command line supports `steady` and `breathe` modes.
+
+Per-key configuration supports most if not all supported custom effects, including colorshift effects and `reactive` keys through a configuration file.
 
 Presets are available for supported models, which emulate vendor-provided SteelSeries configurations.
 
@@ -71,7 +84,9 @@ Presets are available for supported models, which emulate vendor-provided SteelS
 Compatibility
 ----------
 
-This tool should probably work on any recent MSI laptop with a per-key RGB keyboard. It has been succesfully tested with the following models :
+This tool should probably work on any recent MSI laptop with a per-key RGB keyboard. 
+
+The original codebase has been succesfully tested with the following models :
 
 | Model |
 | ----  |
@@ -85,6 +100,12 @@ This tool should probably work on any recent MSI laptop with a per-key RGB keybo
 | GL63  |
 
 
+The newly added 'effect' support has been successfully tested with the following models:
+
+| Model |
+| ----- |
+| GS65  |
+
 Please let me know if it works for your particular model, so that I can update this list.
 
 Requirements
@@ -94,9 +115,11 @@ Requirements
 * setuptools
   * **Archlinux** : `# pacman -S python-setuptools`
   * **Ubuntu** : `# apt install python3-setuptools`
+  * **Fedora** : `# dnf install python3-setuptools`
 * libhidapi 0.8+
 	* **Archlinux** : `# pacman -S hidapi`
 	* **Ubuntu** : `# apt install libhidapi-hidraw0`
+	* **Fedora** : `# dnf install hidapi`
 
 
 Permissions
@@ -121,8 +144,10 @@ msi-perkeyrgb --model <MSI model> -p <preset>
 msi-perkeyrgb --model <MSI model> -c <path to your configuration file>
 ```
 
-The configuration file can take any extension, but each line must have the following syntax :
+The configuration file can take any extension. There are two types of entries:
 
+
+**Key Entries**
 ```
 <keycodes> <mode> <mode options>
 ```
@@ -140,14 +165,52 @@ The configuration file can take any extension, but each line must have the follo
 	* The Function key (Fn) does not have a keycode, so it is identified by the special alias `fn`.
 	* You can mix keycodes, keycode ranges and aliases. Example : `45,arrows,79-82,fn,18`
 
-* `<mode>` : RGB mode for the selected keys. For now only the `steady` mode (fixed color) is available.
-
-* `<mode options>` : for `steady` mode, the desired color in HTML notation. Example : `00ff00` (green)
+* `<mode>` : RGB mode for the selected keys:
+    * Available Modes:
+        * `steady <color>`: Fixed color mode.
+        * `effect <name>`: User-defined effect. See 'effect blocks' below for instructions on how to define a new effect.
+        * `reactive <start color> <press color> <duration>`: Reactive mode; the color will change when you press the key and revert to normal after `duration` ms.
+* `<mode options>` :
+    * `steady`: The desired color in HTML notation. Example : `00ff00` (green).
+    * `effect`: The identifier of an assigned effect block. Example: `effect1`.
+    * `reactive`: The desired starting & target colors in HTML notation, followed by the duration of the effect (in ms). Example: `ff0000 0000ff 250`(Red to Blue with a 250ms duration.)
 
 
 If the same key is configured differently by multiple lines, the lowest line takes priority.
 
-Lines prefixed with `#` are ignored.
+**Effect Blocks**
+
+```
+effect <effectname>
+    start <startcolor>
+    trans <color> <duration>
+    ...
+end
+```
+
+* `<effectname>` : A short identifying name for an effect. This name is used to associate effects with keys.
+* `start <startcolor>` : Indicates what the starting color of the effect will be, before any transitions take place.
+* `trans <color> <duration>` : Defines a transition.
+    * A transition is a shift between two color states. Transitions are loaded in the order they are defined. 
+    * Up to 16 transitions can be registered to a single effect.
+    * Transitions operate in a 'loop' - they will repeat in the defined order indefinitely.
+    * When the animation ends, the color immediately changes back to the starting color before looping again. This creates an effect I call a "seam". A good way of avoiding the seam is to create a transition
+    that returns to the starting color.
+    * The combined duration of all transitions in the loop cannot be greater then 65535 milliseconds. The MSI Control Center
+    only supports up to a 30 second duration, so that is a good rule of thumb to go by.
+        * `color` : The desired color in HTML notation. Example : 00ff00
+        * `duration` : The duration of this transition, in milliseconds. 
+* `wave <origin x> <origin y> <axis> <wavelength> <direction>`: Activates the 'wave' effect.
+    * The wave effect will ONLY play across keys that share the same effect.
+    * The seam is exceptionally visible when Wave Mode is being used.
+        * `<origin x>, <origin y>`: Defines the starting point of the wave effect on the keyboard, in percentage form - 0-100 (0, 0 is the upper left corner of the keyboard.)
+        * `<axis>`: Defines which axes that the wave will radiate on. (Supported: `x`, `y`, `xy`)
+        * `<wavelength>`: Defines the length of each wave pulse. (0-100, percentage)
+        * `<direction>`: Defines whether the wave will go inwards or outwards. (Supported: `in`, `out`)
+    
+Lines prefixed with `#` and blank lines are ignored.
+
+
 
 #### Examples
 
@@ -163,8 +226,51 @@ Only WASD keys (for US layout) lit up in red.
 25,38,39,40 steady ff0000
 ```
 
+Reactive keys that start red, and change to blue for 250ms when the key is pressed.
+```
+25,38,39,40 reactive ff0000 0000ff 250
+```
+
+Defines an effect called `shift1` that transitions from red, to green, to blue over approximately 15 seconds. The final transition is given an extra 1.5 seconds to make the transition from blue back to red smoother (hiding the 'seam').
+```
+effect shift1
+	start ff0000
+	trans 00ff00 500
+	trans 0000ff 500
+	trans ff0000 750
+end
+```
+An effect that uses wave mode. Starts blue, and creates three short waves that flow outward from the center in different colors.
+```
+effect threewave
+	start 0000ff
+	trans 000000 200
+	trans 00ff00 150
+	trans 000000 200
+	trans ff0000 150
+	trans 000000 250
+	wave 40 60 xy 5 out
+end
+```
+
+An iteration of the first effect, only the arrow and function keys use the `shift1` effect.
+```
+all steady ffffff
+arrows steady shift1
+fn steady shift1
+```
+
+A simple, keyboard-wide effect that uses the 'threewave' effect.
+```
+all effect threewave
+```
+
+
+
 How does it work ?
 ----------
+
+[Original Author]
 
 The SteelSeries keyboard is connected to the MSI laptop by two independent interfaces :
 * A PS/2 interface to send keypresses

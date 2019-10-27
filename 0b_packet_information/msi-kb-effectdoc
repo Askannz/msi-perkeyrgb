@@ -1,0 +1,194 @@
+MSI-Steelseries RGB Keyboard Effects Protocol v0.2
+---------------------------------------------
+
+Documented by TauAkiou (www.github.com/TauAkiou)
+
+THIS DOCUMENTATION COMES WITH NO SUPPORT OR LIABILITY. YOU USE THE CONTENTS OF THIS DOCUMENTATION AT YOUR OWN RISK. I CANNOT BE HELD RESPONSIBLE
+IF ANYTHING HAPPENS TO YOU, YOUR COMPUTER, HOUSE, OR ANYTHING. 
+
+-----------------------------------------------
+The Steelseries Effect Protocol [Packet 0x0b]
+-----------------------------------------------
+
+The Effect protocol for the Steelseries RGB protocol is the "0x0b" packet. This packet defines a single "effect"
+that can be assigned to any number of keys. All of the default effects provided by the Steelseries engine can be
+sent to the keyboard through this packet and are in fact derived from it.
+
+Only one effect is sent per packet. Each effect assigned to the keyboard will require it's own 0x0b packet.
+
+  Header	(0x00 - 0x01)
+-----------	
+[0x0b 0x00]
+
+The header does not take or have any arguments attached to it.
+
+Transition Block (0x02 - 0x81)
+-------------------------------
+All transition blocks are 8 bytes in length. The transition table has room for 16 transitions.
+
+
+[<Effect Id>] [0x00] [<RGB Deltas>] [0x00] [Transition Duration] ([Transition #]  [0x00] [<RGB Deltas>] [0x00] [Transition Duration]) ...
+  <1 byte>             <3 bytes>		  <2 bytes, Little Endian>   <1 byte>
+  
+	<Effect Id>
+		- Numerical ID for the effect. This number represents the effect a key will use when assigned to a key in the "0xe0" packet.
+		
+		The effect ID will always represent the first transition in an effect.
+		
+	<RGB Deltas>
+		- Represents how many 'stages' (out of 16) that the controller will brighten or dim the LED over the transition period.
+		
+		[ <Red> <Green> <Blue> ]
+		
+		Each value is a twos-complement signed byte that I have seen range from 0xF1 (-15) to 0x11 (17).
+		
+		The Steelseries Engine only registers a change divisible by 16.
+
+			Example: 
+			From:				->				To:
+			Red: 128							Red: 132
+			Green: 128							Green: 32
+			Blue: 128							Blue: 164
+			
+			will provide deltas of: 
+			
+			Red: 0x00 (0)
+			Blue: 0xFA (-6)
+			Blue: 0x02 (2)
+			
+			The brightness settings for this stage should roughly be:
+			Red: 8 -> 8
+			Green 8 -> 2
+			Blue 8 -> 10
+			
+	<Transition Duration>
+		Determines how long this stage will take (in miliseconds) to transition to its new color.
+		
+		This value must be written in Little Endian.
+		
+			Example: 0xff = 255ms.
+			
+		All durations should add up to the total provided towards the end of the packet.
+		
+	<Transition #>
+	
+	All subsequent transitions will be marked in number order (0x01, 0x02, 0x03, etc) except for the first (the first transition will always be the effect slot number).
+	
+	The fields repeat from the beginning up to the maximum of 16 possible transitions.
+	
+Filler (0x82 -0x83)
+------
+
+[0x00 0x00]
+
+Starting Color (0x84 - 0x89)
+----------------------------
+
+[<Red (2 Bytes) <Green (2 bytes> <Blue (2 bytes)>]
+
+These values are stored unusually.
+
+The first RGB hex value is stored in the second byte, and the second RGB hex is stored in the first byte.
+
+Example: 0x52 is stored as:
+			[0x20 0x05]
+			
+Formula Used:
+	(Color & 0b00001111) << 4 + (Color & 0b11110000) >> 4
+			
+Seperator (0x8a - 0x8b)
+----------------
+
+[0xFF, 0x00]
+			
+Wave Mode (0x8c - 0x95)
+--------------------------------
+
+[<Origin X (2 bytes)>, <Origin Y (2 bytes)>] [<Radiation Control> (4 bytes)] [ <Wavelength> (2 bytes)]
+
+<Origin X, Origin Y> - Determines where on the keyboard the wave will radiate from.
+	- Does not seem to be explicitly accurate in the Steelseries app.
+	- Ranges from:
+		X: [0x00. 0x00] (Left) -> [0x5c, 0x10] (Right)
+		Y: [0x00] (Top) -> [0x0d, 0x04] (Bottom)
+	- Best to interpret as percentage.
+
+<Radiation Control>: Indicates how the wave will radiate from the origin.
+	- [<X Control> (2 bytes)], [<Y Control> (2 bytes)]
+	- Either [0x01, 0x00] or [0x00, 0x00]
+		- 1 means it is radiating in that direction, 0 means it is not.
+		
+<Wavelength>: Indicates the size of the waves radiated from the origin.
+	- Range: [0x1f, 0x00] (low) -> [0xe9, 0x03] (high)
+	- Interpret as percentage.
+
+Transition Count (0x96)
+------------------------
+
+[<count>]
+
+Total count of transitions in the sequence.
+
+Seperator (0x97)
+----------------
+[0x00]
+
+Total Effect Length (0x98 - 0x99)
+---------------------------------
+
+The total combined length of all effects in the effect block, in miliseconds. Stored in Little Endian.
+
+Wave Mode Flag (0x9a)
+--------------
+
+{<flag>]
+
+Is 0 if flowing outward, 1 if inward
+
+Extra Space (0x9b - 0x20C)
+--------------------------
+
+Should be all 0x00.
+
+_____________________________________________________________________________________________________________________
+
+Additions to the 0x0e Packet:
+
+Header
+------
+
+[0x0e [region] 0x00 0x00]
+
+Key Fragment
+------------
+
+[Base <Red> <Green> <Blue>] [Reactive <red> <green> <blue>] [<Reactive Duration>] <Effect ID> <Mode> 0x00 <keycode>
+
+<Base Red, Green, Blue>
+	- Represents a color. Used when defining static key colors. Will only take effect when Mode is 1.
+	
+<Reactive Red, Green, Blue>
+	- Represents a color. This color will be switched to when the key is pressed. Used for Reactive Mode.
+	
+<Reactive Duration>
+	- Represents a timespan in miliseconds. Vendor program ranges from 100ms to 1000ms (1 to 10 seconds) though other values might be possible.
+	
+<Effect ID>
+	- Links the key to an effect. The effect will take hold when the refresh packet is sent.
+	- Appears to be set to a random mode when in reactive.
+	
+<Mode>
+	- Sets the key mode.
+		* 0 - Effect, No Refresh: Used Effect ID declared in the key fragment.
+		* 1 - Inline (Static): Use statically defined values obtained from the key fragment itself. (Ignores Effects?)
+		* 2 - Effect, Refresh: Uses the supplied Effect ID and automatically updates the key lighting when the effect changes. This is used by the Steelseries Engine for effects such as Cooldown Timer (Guess)
+		* 8 - Reactive: This key will react to presses.
+		
+_____________________________________________________________________________________________________________________
+
+Additional Notes:
+-----------------
+
+In-Transition Colorshift: Does not seem to do anything. Please send a message if you figure out how to make it work.
+
+0d packet: Seems related to Live Preview mode. Save command?
