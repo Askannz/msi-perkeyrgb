@@ -25,11 +25,9 @@ After installation, you must reboot your computer (necessary for the udev rule t
 Features
 ----------
 
-Keyboard wide setup from the command line supports `steady` and `breathe` modes.
+Keys can be assigned a fixed color ("steady" mode), either through a configuration file for each individual key, or via a command-line argument for the whole keyboard,
 
-Per-key configuration supports most if not all supported custom effects, including colorshift effects and `reactive` keys through a configuration file.
-
-Presets are available for supported models, which emulate vendor-provided SteelSeries configurations.
+A few select presets are also available for supported models, which emulate vendor-provided SteelSeries configurations.
 
 
 Compatibility
@@ -37,17 +35,17 @@ Compatibility
 
 This tool should probably work on any recent MSI laptop with a per-key RGB keyboard. It was tested with the following models :
 
-| Model | Basic color support | Effects support
-| ----  | ------------------- | --------------
-| GE63  | Yes                 | Yes
-| GE73  | Yes                 | Untested
-| GE75  | Yes                 | Untested
-| GL63  | Yes                 | Untested
-| GS63  | Yes                 | Untested
-| GS65  | Yes                 | Yes
-| GS75  | Yes                 | Untested
-| GT63  | Yes                 | Untested
-| GT75  | Yes                 | Untested
+| Model | Basic color support 
+| ----  | ------------------- 
+| GE63  | Yes
+| GE73  | Yes
+| GE75  | Yes
+| GL63  | Yes
+| GS63  | Yes
+| GS65  | Yes
+| GS75  | Yes
+| GT63  | Yes
+| GT75  | Yes
 
 If you have some additional test results, feel free to open a GitHub issue to help expand this list !
 
@@ -83,11 +81,6 @@ Steady color :
 msi-perkeyrgb --model <MSI model> -s <COLOR>
 ```
 
-"Breathe" color :
-```
-msi-perkeyrgb --model <MSI model> -b <COLOR>
-```
-
 Built-in preset (see `--list-presets` for available options) :
 ```
 msi-perkeyrgb --model <MSI model> -p <preset>
@@ -99,9 +92,7 @@ Set from configuration file :
 ```
 msi-perkeyrgb --model <MSI model> -c <path to your configuration file>
 ```
-This is by far the most flexible and powerful way to use this tool, since the configuration file allows you to set individual key configurations and supports a wide range of lighting effects.
-
-The configuration file can have any extension. See the [dedicated wiki page](https://github.com/Askannz/msi-perkeyrgb/wiki/Configuration-file-guide) for its syntax and examples.
+The configuration file allows you to set individual key configurations. It can have any extension. See the [dedicated wiki page](https://github.com/Askannz/msi-perkeyrgb/wiki/Configuration-file-guide) for its syntax and examples.
 
 
 How does it work, and credits
@@ -111,7 +102,7 @@ The SteelSeries keyboard is connected to the MSI laptop by two independent inter
 * A PS/2 interface to send keypresses
 * a USB HID-compliant interface to receive RGB commands
 
-Talking to the RGB controller from Linux is a matter of sending the correct binary packets on the USB HID interface. I used Wireshark to capture the traffic between the SteelSeries Engine on Windows and the keyboard, and then analyzed the captured data to figure out the protocol used. I was only able to reverse-engineer the simple "steady color" commands, but that work was massively improved upon by [TauAkiou](https://github.com/TauAkiou), who figured out the rest of the protocol and implemented the remaining effects. His work include an amazingly detailed write-up of the protocol which you can read [here](documentation/0b_packet_information/msi-kb-effectdoc).
+Talking to the RGB controller from Linux is a matter of sending the correct binary packets on the USB HID interface. I used Wireshark to capture the traffic between the SteelSeries Engine on Windows and the keyboard, and then analyzed the captured data to figure out the protocol used. I was only able to reverse-engineer the simple "steady color" commands, but that work was massively improved upon by [TauAkiou](https://github.com/TauAkiou), who figured out the rest of the protocol and implemented the remaining effects (UPDATE: effects support been disabled for now, for security reasons. See https://github.com/Askannz/msi-perkeyrgb/issues/24 ). His work include an amazingly detailed write-up of the protocol which you can read [here](documentation/0b_packet_information/msi-kb-effectdoc).
 
 Also thanks to [tbh1](https://github.com/tbh1) for providing packet dumps of presets effects.
 
