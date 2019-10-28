@@ -1,28 +1,21 @@
 #!/bin/bash -e
-# Randomly sets a new preset
-# 1st arg is model name. 2nd argument -d to disable.
 
-if [ "$2" = "-d" ]
-then
-  echo "rgb disabled"
-  msi-perkeyrgb -m $1 $2
-  exit 0
+profs=(aqua chakra default disco drain freeway plain rainbow-split roulette disable)
+fn="./.msi-rgb"
+touch $fn
+prof=$(cat $fn)
+if [ -z "$prof" ]; then
+    echo "0" > $fn
+    vl=0
+else
+    nv=$(($((prof+1)) > 9 ? 0 : $((prof+1))))
+    echo $nv > $fn
+    vl=$nv
 fi
-
-presets=(
-    aqua
-    chakra
-    default
-    disco
-    drain
-    freeway
-    plain
-    rainbow-split
-    roulette
-)
-
-selection=${presets[(( RANDOM % ${#presets[@]}+1 ))]}
-
-msi-perkeyrgb -m GS65 -p $selection
+if [ "${profs[$vl]}" = "disable" ]; then
+    msi-perkeyrgb -m GS65 -d
+else
+    msi-perkeyrgb -m GS65 -p "${profs[$vl]}"
+fi
 
 exit 0
