@@ -18,9 +18,8 @@ git clone https://github.com/Askannz/msi-perkeyrgb
 cd msi-perkeyrgb/
 sudo python3 setup.py install
 sudo cp 99-msi-rgb.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
-
-After installation, you must reboot your computer (necessary for the udev rule to take effect, if you don't you will run into permission problems)
 
 Features
 ----------
