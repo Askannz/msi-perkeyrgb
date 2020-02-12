@@ -1,0 +1,18 @@
+Source: msi-perkeyrgb
+Section: unknown
+Priority: optional
+Maintainer: Hayden Hughes <hayden@vulpes.chickenkiller.com>
+Build-Depends: debhelper-compat (= 12), dh-python, python3-all (>= 3.4)
+Standards-Version: 4.4.0
+Homepage: https://github.com/Askannz/msi-perkeyrgb
+#Vcs-Browser: https://salsa.debian.org/debian/msi-perkeyrgb
+#Vcs-Git: https://salsa.debian.org/debian/msi-perkeyrgb.git
+
+Package: msi-perkeyrgb
+Architecture: any
+Depends: python3 (>= 3.4), libhidapi-hidraw0
+Description: Linux CLI tool to control per-key RGB lighting on MSI laptops.
+ This progam allows to control the SteelSeries per-key RGB keyboard
+ backlighting on MSI laptops such as the GE63VR. It will not work on models
+ with region-based backlighting (such as GE62VR and others). For those you
+ should use tools like MSIKLM.
