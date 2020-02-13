@@ -1,1 +1,1 @@
-99-msi-rgb.rules etc/udev/rules.d/
+99-msi-rgb.rules lib/udev/rules.d/
