@@ -2,6 +2,7 @@
 
 import sys
 import argparse
+import webcolors
 from .protocol_data.msi_keymaps import AVAILABLE_MSI_KEYMAPS
 from .config import load_config, load_steady, ConfigError
 from .parsing import parse_model, parse_usb_id, parse_preset, UnknownModelError, UnknownIdError, UnknownPresetError
@@ -24,7 +25,7 @@ def main():
     parser.add_argument('-p', '--preset', action='store', help='Use vendor preset (see --list-presets).')
     parser.add_argument('-m', '--model', action='store', help='Set laptop model (see --list-models). If not specified, will use %s as default.' % DEFAULT_MODEL)
     parser.add_argument('--list-models', action='store_true', help='List available laptop models.')
-    parser.add_argument('-s', '--steady', action='store', metavar='HEXCOLOR', help='Set all of the keyboard to a steady html color. ex. 00ff00 for green')
+    parser.add_argument('-s', '--steady', action='store', metavar='HEXCOLOR', help='Set all of keyboard to a steady html color (hexcode or css3 webcolor) i.e. 00ff00 or "green"')
 
     args = parser.parse_args()
 
@@ -126,10 +127,13 @@ def main():
             # If user has requested to display a steady color
             elif args.steady:
                 try:
-                    colors_map, warnings = load_steady(args.steady, msi_keymap)
-                except ConfigError as e:
-                    print("Error preparing steady color : %s" % str(e))
-                    sys.exit(1)
+                    colors_map, warnings = load_steady(webcolors.name_to_hex(args.steady).replace("#",""), msi_keymap)
+                except ValueError as e:
+                    try:
+                        colors_map, warnings = load_steady(args.steady, msi_keymap)
+                    except ConfigError as e:
+                        print("Error preparing steady color : %s" % str(e))
+                        sys.exit(1)
                 kb.set_colors(colors_map)
                 kb.refresh()
 
