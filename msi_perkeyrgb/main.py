@@ -43,7 +43,7 @@ def main():
 
         # Parse laptop model
         if not args.model:
-            print("No laptop model specified, using %s as default." % DEFAULT_MODEL)
+            # print("No laptop model specified, using %s as default." % DEFAULT_MODEL)
             msi_model = DEFAULT_MODEL
         else:
             try:
@@ -127,7 +127,7 @@ def main():
             # If user has requested to display a steady color
             elif args.steady:
                 try:
-                    colors_map, warnings = load_steady(webcolors.name_to_hex(args.steady).replace("#",""), msi_keymap)
+                    colors_map, warnings = load_steady(webcolors.name_to_hex(args.steady).[1:], msi_keymap)
                 except ValueError as e:
                     try:
                         colors_map, warnings = load_steady(args.steady, msi_keymap)
