@@ -28,7 +28,7 @@ def main():
     parser.add_argument('-m', '--model', action='store', help='Set laptop model (see --list-models). If not specified, will use %s as default.' % DEFAULT_MODEL)
     parser.add_argument('--list-models', action='store_true', help='List available laptop models.')
     parser.add_argument('-s', '--steady', action='store', metavar='COLOR', help='Set all of keyboard to a steady hex or css3 color e.g. 00ff00 or green.')
-    parser.add_argument('-r', '--random',action='store_true',help='Set all of keyboard to a random hex color.')
+    parser.add_argument('-r', '--random', action='store_true', help='Set all of keyboard to a random hex color.')
 
     args = parser.parse_args()
 
