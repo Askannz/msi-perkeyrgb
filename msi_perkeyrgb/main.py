@@ -149,20 +149,19 @@ def main():
                     # 
                     # HLS was chosen instead of HVL due to being more human-friendly
                     # see https://en.wikipedia.org/wiki/HSL_and_HSV#Motivation
-                    col=webcolors.PercentRGB(
+                    col_rgb_percent = webcolors.PercentRGB(
                             *colorsys.hls_to_rgb(
                                 random.random(),        # hue
                                 random.random()*.5+.25, # lightness
                                 random.random()*.5+.5   # saturation
                                 )
                             )
-                    colors_map, warnings = load_steady(
-                            webcolors.rgb_percent_to_hex(["{:.2%}".format(val) for val in col])[1:],
-                            msi_keymap
-                            )
+                    col_hex = webcolors.rgb_percent_to_hex(["{:.2%}".format(val) for val in col_rgb_percent])[1:]
+                    colors_map, warnings = load_steady(col_hex,msi_keymap)
                 except ConfigError as e:
                     print("Error preparing steady color : %s" % str(e))
                     sys.exit(1)
+                print("Setting keyboard color as #{}".format(col_hex))
                 kb.set_colors(colors_map)
                 kb.refresh()
 
