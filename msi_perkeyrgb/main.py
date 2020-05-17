@@ -2,6 +2,9 @@
 
 import sys
 import argparse
+import webcolors
+import colorsys
+import random
 from .protocol_data.msi_keymaps import AVAILABLE_MSI_KEYMAPS
 from .config import load_config, load_steady, ConfigError
 from .parsing import parse_model, parse_usb_id, parse_preset, UnknownModelError, UnknownIdError, UnknownPresetError
@@ -24,7 +27,8 @@ def main():
     parser.add_argument('-p', '--preset', action='store', help='Use vendor preset (see --list-presets).')
     parser.add_argument('-m', '--model', action='store', help='Set laptop model (see --list-models). If not specified, will use %s as default.' % DEFAULT_MODEL)
     parser.add_argument('--list-models', action='store_true', help='List available laptop models.')
-    parser.add_argument('-s', '--steady', action='store', metavar='HEXCOLOR', help='Set all of the keyboard to a steady html color. ex. 00ff00 for green')
+    parser.add_argument('-s', '--steady', action='store', metavar='COLOR', help='Set all of keyboard to a steady hex or css3 color e.g. 00ff00 or green.')
+    parser.add_argument('-r', '--random', action='store_true', help='Set all of keyboard to a random hex color.')
 
     args = parser.parse_args()
 
@@ -126,10 +130,38 @@ def main():
             # If user has requested to display a steady color
             elif args.steady:
                 try:
-                    colors_map, warnings = load_steady(args.steady, msi_keymap)
+                    colors_map, warnings = load_steady(webcolors.name_to_hex(args.steady)[1:], msi_keymap)
+                except ValueError as e:
+                    try:
+                        colors_map, warnings = load_steady(args.steady, msi_keymap)
+                    except ConfigError as e:
+                        print("Error preparing steady color : %s" % str(e))
+                        sys.exit(1)
+                kb.set_colors(colors_map)
+                kb.refresh()
+
+            # If user has requested to display a random color
+            elif args.random:
+                try:
+                    # Generate random color with 25% <= luminance < 75% and 50% <= saturation < 100%
+                    # these bounds were chosen arbitrarily by inspection so that
+                    # the resulting random color won't be too light or dark or desaturated.
+                    # 
+                    # HLS was chosen instead of HVL due to being more human-friendly
+                    # see https://en.wikipedia.org/wiki/HSL_and_HSV#Motivation
+                    col_rgb_percent = webcolors.PercentRGB(
+                            *colorsys.hls_to_rgb(
+                                random.random(),        # hue
+                                random.random()*.5+.25, # lightness
+                                random.random()*.5+.5   # saturation
+                                )
+                            )
+                    col_hex = webcolors.rgb_percent_to_hex(["{:.2%}".format(val) for val in col_rgb_percent])[1:]
+                    colors_map, warnings = load_steady(col_hex,msi_keymap)
                 except ConfigError as e:
                     print("Error preparing steady color : %s" % str(e))
                     sys.exit(1)
+                print("Setting keyboard color as #{}".format(col_hex))
                 kb.set_colors(colors_map)
                 kb.refresh()
 
